@@ -163,9 +163,6 @@ const GameEndScreen = forwardRef<GameEndScreenRef, GameEndScreenProps>(
           <h2 className="text-sm font-bold bit-text pixel-text uppercase mb-1">
             You Won!
           </h2>
-          <p className="text-[10px] bit-text opacity-60 mb-1">
-            10 out of 10! 🏆
-          </p>
           <p className="text-[10px] bit-text opacity-60 mb-4">
             Here's what {senderName} wanted to say:
           </p>
