@@ -51,8 +51,8 @@ const PongGame = forwardRef<PongGameRef, PongGameProps>(({
   const gameStateRef = useRef({
     ballX: 0,
     ballY: 0,
-    ballVX: 1.8, // 60% of original 3
-    ballVY: 1.2, // 60% of original 2
+    ballVX: 2.16, // 20% faster
+    ballVY: 1.44, // 20% faster
     playerY: 0,
     aiY: 0,
     playerDir: 0,
@@ -60,7 +60,7 @@ const PongGame = forwardRef<PongGameRef, PongGameProps>(({
     bubbleId: 0,
   });
 
-  const PADDLE_HEIGHT = 120; // doubled from 60
+  const PADDLE_HEIGHT = 100;
   const PADDLE_WIDTH = 8;
   const BALL_SIZE = 6;
   const WINNING_SCORE = 10;
@@ -290,8 +290,8 @@ const PongGame = forwardRef<PongGameRef, PongGameProps>(({
     const resetBall = (w: number, h: number) => {
       state.ballX = w / 2;
       state.ballY = h / 2;
-      state.ballVX = (Math.random() > 0.5 ? 1.8 : -1.8); // 60% speed
-      state.ballVY = (Math.random() - 0.5) * 2.4; // 60% speed
+      state.ballVX = (Math.random() > 0.5 ? 2.16 : -2.16); // 20% faster
+      state.ballVY = (Math.random() - 0.5) * 2.88; // 20% faster
     };
 
     if (gameStarted) {
