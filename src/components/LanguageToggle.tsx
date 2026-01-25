@@ -18,7 +18,7 @@ const LanguageToggle = ({ language, onToggle }: LanguageToggleProps) => {
       >
         EN
       </button>
-      <div className="w-[1px] h-3 bg-current opacity-40" />
+      
       <button
         onClick={() => onToggle('zh')}
         className={`px-2 py-0.5 text-[9px] font-bold transition-colors ${
