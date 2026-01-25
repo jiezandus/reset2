@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState, useCallback, useImperativeHandle, forwardRef } from 'react';
 import SpeechBubble from './SpeechBubble';
+import { t, Language, getApologyMessages } from '@/lib/i18n';
 
 interface PongGameProps {
   senderName: string;
   recipientName: string;
   reason: string;
+  language: Language;
   onGameEnd: (winner: 'recipient' | 'sender') => void;
   onStartGame?: () => void;
 }
@@ -23,22 +25,11 @@ interface Bubble {
   y: number;
 }
 
-const APOLOGY_MESSAGES = [
-  "OOPS!",
-  "NICE ONE",
-  "UR GOOD",
-  "MY BAD",
-  "HELP ME",
-  "SORRY!",
-  "YIKES",
-  "TOO FAST",
-  "OUCH!",
-];
-
 const PongGame = forwardRef<PongGameRef, PongGameProps>(({ 
   senderName, 
   recipientName, 
   reason, 
+  language,
   onGameEnd,
   onStartGame 
 }, ref) => {
@@ -49,11 +40,13 @@ const PongGame = forwardRef<PongGameRef, PongGameProps>(({
   const [bubbles, setBubbles] = useState<Bubble[]>([]);
   const [gameStarted, setGameStarted] = useState(false);
   
+  const apologyMessages = getApologyMessages(language);
+  
   const gameStateRef = useRef({
     ballX: 0,
     ballY: 0,
-    ballVX: 2.6, // 40% faster than original
-    ballVY: 1.73, // 40% faster than original
+    ballVX: 2.6,
+    ballVY: 1.73,
     playerY: 0,
     aiY: 0,
     playerDir: 0,
@@ -67,15 +60,14 @@ const PongGame = forwardRef<PongGameRef, PongGameProps>(({
   const WINNING_SCORE = 10;
   const PIXEL_SIZE = 2;
 
-  // 1-bit colors
-  const BIT_WHITE = '#c8d4a2'; // LCD light
-  const BIT_BLACK = '#1a1a1a'; // LCD dark
+  const BIT_WHITE = '#c8d4a2';
+  const BIT_BLACK = '#1a1a1a';
 
   const addBubble = useCallback((x: number, y: number) => {
-    const message = APOLOGY_MESSAGES[Math.floor(Math.random() * APOLOGY_MESSAGES.length)];
+    const message = apologyMessages[Math.floor(Math.random() * apologyMessages.length)];
     const id = gameStateRef.current.bubbleId++;
     setBubbles(prev => [...prev, { id, message, x, y }]);
-  }, []);
+  }, [apologyMessages]);
 
   const removeBubble = useCallback((id: number) => {
     setBubbles(prev => prev.filter(b => b.id !== id));
@@ -162,11 +154,9 @@ const PongGame = forwardRef<PongGameRef, PongGameProps>(({
       const deltaTime = timestamp - lastTime;
       lastTime = timestamp;
 
-      // Clear with 1-bit white
       ctx.fillStyle = BIT_WHITE;
       ctx.fillRect(0, 0, width, height);
 
-      // Draw dotted center line
       const dotSize = PIXEL_SIZE * 2;
       const gap = PIXEL_SIZE * 6;
       ctx.fillStyle = BIT_BLACK;
@@ -174,11 +164,9 @@ const PongGame = forwardRef<PongGameRef, PongGameProps>(({
         ctx.fillRect(snapToGrid(width / 2 - dotSize / 2), y, dotSize, dotSize);
       }
 
-      // Update player paddle
       state.playerY += state.playerDir;
       state.playerY = Math.max(0, Math.min(height - PADDLE_HEIGHT, state.playerY));
 
-      // AI paddle (intentionally bad)
       const aiCenter = state.aiY + PADDLE_HEIGHT / 2;
       const targetY = state.ballX > width * 0.5 
         ? state.ballY + (Math.random() - 0.5) * 60
@@ -194,17 +182,14 @@ const PongGame = forwardRef<PongGameRef, PongGameProps>(({
       }
       state.aiY = Math.max(0, Math.min(height - PADDLE_HEIGHT, state.aiY));
 
-      // Update ball
       state.ballX += state.ballVX;
       state.ballY += state.ballVY;
 
-      // Ball collision with top/bottom
       if (state.ballY <= BALL_SIZE || state.ballY >= height - BALL_SIZE) {
         state.ballVY *= -1;
         state.ballY = Math.max(BALL_SIZE, Math.min(height - BALL_SIZE, state.ballY));
       }
 
-      // Ball collision with player paddle
       if (
         state.ballX <= PADDLE_WIDTH + BALL_SIZE + 8 &&
         state.ballY >= state.playerY &&
@@ -216,7 +201,6 @@ const PongGame = forwardRef<PongGameRef, PongGameProps>(({
         state.ballVY = (hitPos - 0.5) * 6;
       }
 
-      // Ball collision with AI paddle
       if (
         state.ballX >= width - PADDLE_WIDTH - BALL_SIZE - 8 &&
         state.ballY >= state.aiY &&
@@ -233,7 +217,6 @@ const PongGame = forwardRef<PongGameRef, PongGameProps>(({
         }
       }
 
-      // Scoring
       if (state.ballX < 0) {
         setSenderScore(prev => {
           const newScore = prev + 1;
@@ -257,11 +240,9 @@ const PongGame = forwardRef<PongGameRef, PongGameProps>(({
         addBubble(width - 100, state.aiY);
       }
 
-      // Draw paddles (chunky pixels)
       drawPixelRect(6, state.playerY, PADDLE_WIDTH, PADDLE_HEIGHT);
       drawPixelRect(width - PADDLE_WIDTH - 6, state.aiY, PADDLE_WIDTH, PADDLE_HEIGHT);
 
-      // Draw ball (square for 1-bit look)
       ctx.fillStyle = BIT_BLACK;
       ctx.fillRect(
         snapToGrid(state.ballX - BALL_SIZE),
@@ -270,14 +251,12 @@ const PongGame = forwardRef<PongGameRef, PongGameProps>(({
         BALL_SIZE * 2
       );
 
-      // Draw scores
       ctx.font = 'bold 16px monospace';
       ctx.textAlign = 'center';
       ctx.fillStyle = BIT_BLACK;
       ctx.fillText(`${recipientScore}/10`, width / 4, 28);
       ctx.fillText(`${senderScore}/10`, (width / 4) * 3, 28);
 
-      // Player labels
       ctx.font = 'bold 16px monospace';
       ctx.fillStyle = BIT_BLACK;
       const shortRecipient = recipientName.slice(0, 6).toUpperCase();
@@ -291,8 +270,8 @@ const PongGame = forwardRef<PongGameRef, PongGameProps>(({
     const resetBall = (w: number, h: number) => {
       state.ballX = w / 2;
       state.ballY = h / 2;
-      state.ballVX = (Math.random() > 0.5 ? 2.6 : -2.6); // 40% faster than original
-      state.ballVY = (Math.random() - 0.5) * 3.46; // 40% faster than original
+      state.ballVX = (Math.random() > 0.5 ? 2.6 : -2.6);
+      state.ballVY = (Math.random() - 0.5) * 3.46;
     };
 
     if (gameStarted) {
@@ -309,17 +288,17 @@ const PongGame = forwardRef<PongGameRef, PongGameProps>(({
       <div className="relative w-full h-full flex flex-col items-center justify-center p-4 text-center bit-bg">
         <div className="space-y-3 animate-slide-up">
           <h2 className="text-xs font-bold bit-text pixel-text uppercase">
-            HEY {recipientName.toUpperCase().slice(0, 8)}!
+            {t('hey', language, { name: recipientName.toUpperCase().slice(0, 8) })}
           </h2>
           <p className="text-[10px] bit-text opacity-70 px-4">
-            {senderName} has prepared a surprise challenge for you.
+            {t('surpriseChallenge', language, { name: senderName })}
           </p>
           <p className="text-[10px] bit-text opacity-70">
-            Accept to beat them!
+            {t('acceptToBeat', language)}
           </p>
           <div className="pt-3">
             <span className="text-[10px] bit-text animate-blink-cursor">
-              ▶ PRESS A TO START
+              {t('pressToStart', language)}
             </span>
           </div>
         </div>

@@ -1,5 +1,6 @@
 import { forwardRef, useImperativeHandle, useState } from 'react';
-import { Share2, Copy, Check } from 'lucide-react';
+import { Copy, Check } from 'lucide-react';
+import { t, Language, getReplyOptions } from '@/lib/i18n';
 
 type GamePhase = 'apology' | 'reply' | 'success';
 
@@ -7,6 +8,7 @@ interface GameEndScreenProps {
   senderName: string;
   recipientName: string;
   reason: string;
+  language: Language;
   winner: 'recipient' | 'sender';
   onBack?: () => void;
 }
@@ -15,27 +17,27 @@ export interface GameEndScreenRef {
   pressB: () => void;
 }
 
-const REPLY_OPTIONS = [
-  { id: 'ok', text: "I'm actually ok. Don't worry.", shortText: "ALL GOOD" },
-  { id: 'talk', text: "Apology accepted. Let's talk.", shortText: "LET'S TALK" },
-  { id: 'time', text: "Give me more time. I'll reach out.", shortText: "NEED TIME" },
-];
-
 const GameEndScreen = forwardRef<GameEndScreenRef, GameEndScreenProps>(
-  ({ senderName, recipientName, reason, winner, onBack }, ref) => {
+  ({ senderName, recipientName, reason, language, winner, onBack }, ref) => {
   const [phase, setPhase] = useState<GamePhase>('apology');
   const [selectedReply, setSelectedReply] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+
+  const replyOptions = getReplyOptions(language);
 
   const handleContinueToReply = () => {
     setPhase('reply');
   };
 
-  const selectedOption = REPLY_OPTIONS.find(opt => opt.id === selectedReply);
+  const selectedOption = replyOptions.find(opt => opt.id === selectedReply);
 
   const getShareMessage = () => {
     if (!selectedOption) return '';
-    return `Hey ${senderName}! 💌\n\n${recipientName} played your challenge and here's their response:\n\n"${selectedOption.text}"\n\n— via RESET`;
+    return t('replyShareMessage', language, {
+      sender: senderName,
+      recipient: recipientName,
+      reply: selectedOption.text,
+    });
   };
 
   const handleShare = async () => {
@@ -55,7 +57,6 @@ const GameEndScreen = forwardRef<GameEndScreenRef, GameEndScreenProps>(
       console.error('Failed to copy:', err);
     }
   };
-
 
   const handleSelectReply = (replyId: string) => {
     setSelectedReply(replyId);
@@ -108,16 +109,16 @@ const GameEndScreen = forwardRef<GameEndScreenRef, GameEndScreenProps>(
             </div>
           </div>
           <h2 className="text-sm font-bold bit-text pixel-text uppercase mb-1">
-            Oops!
+            {t('oops', language)}
           </h2>
           <p className="text-[10px] bit-text opacity-60 mb-4">
-            {senderName} won somehow...
+            {t('senderWonMessage', language, { name: senderName })}
           </p>
           <button
             onClick={() => window.location.reload()}
             className="bit-button px-4 py-2 text-xs"
           >
-            Try Again ►
+            {t('tryAgain', language)}
           </button>
         </div>
       </div>
@@ -149,26 +150,26 @@ const GameEndScreen = forwardRef<GameEndScreenRef, GameEndScreenProps>(
           </div>
           
           <h2 className="text-sm font-bold bit-text pixel-text uppercase mb-1">
-            You Won!
+            {t('youWon', language)}
           </h2>
           <p className="text-[10px] bit-text opacity-60 mb-4">
-            Here's what {senderName} wanted to say:
+            {t('hereIsWhatTheySaid', language, { name: senderName })}
           </p>
 
           <div className="border-2 border-current px-4 py-3 mb-4 max-w-[220px]">
             <p className="text-xs bit-text">
-              I am sorry for {reason.slice(0, 70)}{reason.length > 70 ? '...' : ''}
+              {t('iAmSorryFor', language, { reason: reason.slice(0, 70) + (reason.length > 70 ? '...' : '') })}
             </p>
           </div>
 
           <p className="text-[9px] bit-text opacity-50">
-            Would you like to send a reply?
+            {t('wouldYouLikeToReply', language)}
           </p>
           <button 
             onClick={handleContinueToReply}
             className="text-[10px] bit-text opacity-70 mt-2 animate-blink-cursor hover:opacity-100 transition-opacity"
           >
-            Press Ⓑ to continue
+            {t('pressBToContinue', language)}
           </button>
         </div>
       </div>
@@ -181,14 +182,14 @@ const GameEndScreen = forwardRef<GameEndScreenRef, GameEndScreenProps>(
       <div className="w-full h-full flex flex-col items-center justify-center p-4 text-center bit-bg">
         <div className="flex flex-col items-center animate-pop-in w-full max-w-[240px]">
           <h2 className="text-sm font-bold bit-text pixel-text uppercase mb-1">
-            Your Reply
+            {t('yourReply', language)}
           </h2>
           <p className="text-[10px] bit-text opacity-60 mb-4">
-            How do you want to respond?
+            {t('howToRespond', language)}
           </p>
 
           <div className="flex flex-col gap-2 w-full mb-4">
-            {REPLY_OPTIONS.map((option) => (
+            {replyOptions.map((option) => (
               <button
                 key={option.id}
                 onClick={() => handleSelectReply(option.id)}
@@ -208,7 +209,7 @@ const GameEndScreen = forwardRef<GameEndScreenRef, GameEndScreenProps>(
               onClick={handleBackFromReply}
               className="bit-button-outline flex-1 px-3 py-2 text-[10px]"
             >
-              ← Back
+              {t('back', language)}
             </button>
             <button
               onClick={handleShare}
@@ -218,12 +219,12 @@ const GameEndScreen = forwardRef<GameEndScreenRef, GameEndScreenProps>(
               {copied ? (
                 <>
                   <Check className="w-3 h-3" />
-                  OK!
+                  {t('ok', language)}
                 </>
               ) : (
                 <>
                   <Copy className="w-3 h-3" />
-                  Copy & Send
+                  {t('copyAndSend', language)}
                 </>
               )}
             </button>
@@ -257,31 +258,31 @@ const GameEndScreen = forwardRef<GameEndScreenRef, GameEndScreenProps>(
         </div>
         
         <h2 className="text-sm font-bold bit-text pixel-text uppercase mb-2">
-          Message Sent!
+          {t('messageSent', language)}
         </h2>
         <p className="text-[10px] bit-text opacity-70 mb-3 px-4">
-          Your response has been copied. Now paste it in your chat with {senderName}!
+          {t('responseCopied', language, { name: senderName })}
         </p>
 
         {selectedOption && (
           <div className="border-2 border-current px-4 py-2 mb-4 max-w-[200px]">
-            <p className="text-[9px] bit-text opacity-60 mb-1">You said:</p>
+            <p className="text-[9px] bit-text opacity-60 mb-1">{t('youSaid', language)}</p>
             <p className="text-[10px] bit-text">"{selectedOption.text}"</p>
           </div>
         )}
 
         <p className="text-[10px] bit-text opacity-60 mb-1 px-4">
-          Relationships are precious gifts.
+          {t('relationshipsPrecious', language)}
         </p>
         <p className="text-[10px] bit-text opacity-50 mb-4 px-4">
-          Cherish them always. Best wishes! ✨
+          {t('cherishThem', language)}
         </p>
 
         <button
           onClick={handleBackFromSuccess}
           className="bit-button-outline px-4 py-2 text-[10px]"
         >
-          ← Back
+          {t('back', language)}
         </button>
       </div>
     </div>
