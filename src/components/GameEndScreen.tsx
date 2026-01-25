@@ -14,7 +14,7 @@ interface GameEndScreenProps {
 const REPLY_OPTIONS = [
   { id: 'ok', text: "I'm actually ok. Don't worry.", shortText: "ALL GOOD" },
   { id: 'talk', text: "Apology accepted. Let's talk.", shortText: "LET'S TALK" },
-  { id: 'time', text: "Give me more time.", shortText: "NEED TIME" },
+  { id: 'time', text: "Give me more time. I'll reach out.", shortText: "NEED TIME" },
 ];
 
 const GameEndScreen = ({ senderName, recipientName, reason, winner, onBack }: GameEndScreenProps) => {
@@ -148,22 +148,17 @@ const GameEndScreen = ({ senderName, recipientName, reason, winner, onBack }: Ga
           </p>
 
           <div className="border-2 border-current px-4 py-3 mb-4 max-w-[200px]">
-            <p className="text-[9px] bit-text opacity-60 mb-1">I'm sorry for:</p>
-            <p className="text-xs font-bold bit-text">
-              "{reason.slice(0, 60)}{reason.length > 60 ? '...' : ''}"
+            <p className="text-xs bit-text">
+              {reason.slice(0, 80)}{reason.length > 80 ? '...' : ''}
             </p>
           </div>
 
-          <p className="text-[9px] bit-text opacity-50 mb-4">
-            Press B to continue
+          <p className="text-[9px] bit-text opacity-50">
+            Would you like to send a reply?
           </p>
-
-          <button
-            onClick={handleContinueToReply}
-            className="bit-button px-4 py-2 text-xs"
-          >
-            Continue ►
-          </button>
+          <p className="text-[10px] bit-text opacity-70 mt-1 animate-blink-cursor">
+            Press Ⓑ to continue
+          </p>
         </div>
       </div>
     );
@@ -264,11 +259,11 @@ const GameEndScreen = ({ senderName, recipientName, reason, winner, onBack }: Ga
           </div>
         )}
 
-        <p className="text-[10px] bit-text opacity-60 mb-1">
-          Now let's wait for their response...
+        <p className="text-[10px] bit-text opacity-60 mb-1 px-4">
+          Relationships are precious gifts.
         </p>
-        <p className="text-[10px] bit-text opacity-50 mb-4">
-          Good luck! 🍀
+        <p className="text-[10px] bit-text opacity-50 mb-4 px-4">
+          Cherish them always. Best wishes! ✨
         </p>
 
         <button
