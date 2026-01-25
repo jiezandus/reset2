@@ -45,49 +45,43 @@ const ConsoleFrame = ({
 
           {/* Controls area - fixed at bottom */}
           <div className="flex items-center justify-between px-4 pb-6 pt-2">
-            {/* D-pad - unified cross shape */}
+            {/* D-pad - unified + shape like Playdate */}
             <div className="relative">
               {showDpad ? (
-                <div className="dpad-cross-unified relative w-20 h-20 shadow-dpad-extruded rounded-md">
-                  {/* Cross shape using clip-path */}
-                  <div className="absolute inset-0 bg-primary dpad-cross-shape">
-                    {/* Up button */}
-                    <button
-                      onTouchStart={(e) => { e.preventDefault(); onDpadUp?.(); }}
-                      onTouchEnd={(e) => { e.preventDefault(); onDpadRelease?.(); }}
-                      onMouseDown={onDpadUp}
-                      onMouseUp={onDpadRelease}
-                      onMouseLeave={onDpadRelease}
-                      className="absolute top-0 left-1/2 -translate-x-1/2 w-7 h-[26px] flex items-center justify-center active:bg-black/10 transition-colors"
-                      aria-label="Move up"
-                    >
-                      <div className="w-0 h-0 border-l-[5px] border-r-[5px] border-b-[7px] border-l-transparent border-r-transparent border-b-console-shadow/50" />
-                    </button>
-                    {/* Down button */}
-                    <button
-                      onTouchStart={(e) => { e.preventDefault(); onDpadDown?.(); }}
-                      onTouchEnd={(e) => { e.preventDefault(); onDpadRelease?.(); }}
-                      onMouseDown={onDpadDown}
-                      onMouseUp={onDpadRelease}
-                      onMouseLeave={onDpadRelease}
-                      className="absolute bottom-0 left-1/2 -translate-x-1/2 w-7 h-[26px] flex items-center justify-center active:bg-black/10 transition-colors"
-                      aria-label="Move down"
-                    >
-                      <div className="w-0 h-0 border-l-[5px] border-r-[5px] border-t-[7px] border-l-transparent border-r-transparent border-t-console-shadow/50" />
-                    </button>
-                    {/* Left (disabled) */}
-                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[26px] h-7 flex items-center justify-center opacity-30">
-                      <div className="w-0 h-0 border-t-[5px] border-b-[5px] border-r-[7px] border-t-transparent border-b-transparent border-r-console-shadow/50" />
-                    </div>
-                    {/* Right (disabled) */}
-                    <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[26px] h-7 flex items-center justify-center opacity-30">
-                      <div className="w-0 h-0 border-t-[5px] border-b-[5px] border-l-[7px] border-t-transparent border-b-transparent border-l-console-shadow/50" />
-                    </div>
+                <div className="dpad-plus relative w-[72px] h-[72px]">
+                  {/* Unified + shape */}
+                  <div className="absolute inset-0">
+                    {/* Vertical arm */}
+                    <div className="absolute left-1/2 -translate-x-1/2 top-0 w-6 h-full bg-primary rounded-full shadow-dpad-plus" />
+                    {/* Horizontal arm */}
+                    <div className="absolute top-1/2 -translate-y-1/2 left-0 w-full h-6 bg-primary rounded-full shadow-dpad-plus" />
                   </div>
+                  {/* Interactive buttons overlay */}
+                  <button
+                    onTouchStart={(e) => { e.preventDefault(); onDpadUp?.(); }}
+                    onTouchEnd={(e) => { e.preventDefault(); onDpadRelease?.(); }}
+                    onMouseDown={onDpadUp}
+                    onMouseUp={onDpadRelease}
+                    onMouseLeave={onDpadRelease}
+                    className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-6 flex items-center justify-center active:brightness-95 transition-all z-10"
+                    aria-label="Move up"
+                  />
+                  <button
+                    onTouchStart={(e) => { e.preventDefault(); onDpadDown?.(); }}
+                    onTouchEnd={(e) => { e.preventDefault(); onDpadRelease?.(); }}
+                    onMouseDown={onDpadDown}
+                    onMouseUp={onDpadRelease}
+                    onMouseLeave={onDpadRelease}
+                    className="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-6 flex items-center justify-center active:brightness-95 transition-all z-10"
+                    aria-label="Move down"
+                  />
                 </div>
               ) : (
-                <div className="dpad-cross-unified relative w-20 h-20 opacity-50 shadow-dpad-extruded rounded-md">
-                  <div className="absolute inset-0 bg-primary dpad-cross-shape" />
+                <div className="dpad-plus relative w-[72px] h-[72px] opacity-50">
+                  {/* Vertical arm */}
+                  <div className="absolute left-1/2 -translate-x-1/2 top-0 w-6 h-full bg-primary rounded-full shadow-dpad-plus" />
+                  {/* Horizontal arm */}
+                  <div className="absolute top-1/2 -translate-y-1/2 left-0 w-full h-6 bg-primary rounded-full shadow-dpad-plus" />
                 </div>
               )}
             </div>
