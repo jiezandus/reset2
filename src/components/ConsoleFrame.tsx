@@ -51,10 +51,10 @@ const ConsoleFrame = ({
                 <div className="dpad-plus relative w-[72px] h-[72px]">
                   {/* Unified + shape */}
                   <div className="absolute inset-0">
-                    {/* Vertical arm */}
-                    <div className="absolute left-1/2 -translate-x-1/2 top-0 w-6 h-full bg-primary rounded-full shadow-dpad-plus" />
                     {/* Horizontal arm */}
                     <div className="absolute top-1/2 -translate-y-1/2 left-0 w-full h-6 bg-primary rounded-full shadow-dpad-plus" />
+                    {/* Vertical arm */}
+                    <div className="absolute left-1/2 -translate-x-1/2 top-0 w-6 h-full bg-primary rounded-full shadow-dpad-plus" />
                   </div>
                   {/* Interactive buttons overlay */}
                   <button
@@ -78,10 +78,10 @@ const ConsoleFrame = ({
                 </div>
               ) : (
                 <div className="dpad-plus relative w-[72px] h-[72px] opacity-50">
-                  {/* Vertical arm */}
-                  <div className="absolute left-1/2 -translate-x-1/2 top-0 w-6 h-full bg-primary rounded-full shadow-dpad-plus" />
                   {/* Horizontal arm */}
                   <div className="absolute top-1/2 -translate-y-1/2 left-0 w-full h-6 bg-primary rounded-full shadow-dpad-plus" />
+                  {/* Vertical arm */}
+                  <div className="absolute left-1/2 -translate-x-1/2 top-0 w-6 h-full bg-primary rounded-full shadow-dpad-plus" />
                 </div>
               )}
             </div>
