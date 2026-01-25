@@ -117,7 +117,7 @@ const Index = () => {
                 <textarea
                   value={reason}
                   onChange={(e) => setReason(e.target.value)}
-                  placeholder="I'm sorry for..."
+                  placeholder="being late/eating your food/ghosting you...etc"
                   rows={2}
                   className="bit-input w-full px-3 py-2 text-xs resize-none"
                 />
