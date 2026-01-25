@@ -111,6 +111,13 @@
       inset 0 1px 0 hsl(45 100% 70%);
   }
 
+  /* Cross-shaped D-pad */
+  .dpad-cross-shape {
+    clip-path: polygon(
+      35% 0%, 65% 0%, 65% 35%, 100% 35%, 100% 65%, 65% 65%, 65% 100%, 35% 100%, 35% 65%, 0% 65%, 0% 35%, 35% 35%
+    );
+  }
+
   /* Extruded A/B button shadows */
   .shadow-ab-extruded {
     box-shadow:
