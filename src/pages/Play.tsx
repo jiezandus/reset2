@@ -1,14 +1,15 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import ConsoleFrame from '@/components/ConsoleFrame';
 import PongGame from '@/components/PongGame';
-import GameEndScreen from '@/components/GameEndScreen';
+import GameEndScreen, { type GameEndScreenRef } from '@/components/GameEndScreen';
 const Play = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [gameState, setGameState] = useState<'playing' | 'ended'>('playing');
   const [winner, setWinner] = useState<'recipient' | 'sender'>('recipient');
   const [playerDir, setPlayerDir] = useState<'up' | 'down' | null>(null);
+  const endScreenRef = useRef<GameEndScreenRef | null>(null);
   const senderName = searchParams.get('sender') || 'Someone';
   const recipientName = searchParams.get('recipient') || 'Friend';
   const reason = searchParams.get('reason') || 'something';
@@ -41,8 +42,8 @@ const Play = () => {
     window.dispatchEvent(new KeyboardEvent('keydown', {
       key: 'ArrowDown'
     }));
-  }}>
-      {gameState === 'playing' ? <PongGame senderName={senderName} recipientName={recipientName} reason={reason} onGameEnd={handleGameEnd} /> : <GameEndScreen senderName={senderName} recipientName={recipientName} reason={reason} winner={winner} onBack={() => setGameState('playing')} />}
+  }} onButtonB={gameState === 'ended' ? () => endScreenRef.current?.pressB() : undefined}>
+      {gameState === 'playing' ? <PongGame senderName={senderName} recipientName={recipientName} reason={reason} onGameEnd={handleGameEnd} /> : <GameEndScreen ref={endScreenRef} senderName={senderName} recipientName={recipientName} reason={reason} winner={winner} onBack={() => setGameState('playing')} />}
     </ConsoleFrame>;
 };
 export default Play;
