@@ -51,8 +51,8 @@ const PongGame = forwardRef<PongGameRef, PongGameProps>(({
   const gameStateRef = useRef({
     ballX: 0,
     ballY: 0,
-    ballVX: 3,
-    ballVY: 2,
+    ballVX: 1.8, // 60% of original 3
+    ballVY: 1.2, // 60% of original 2
     playerY: 0,
     aiY: 0,
     playerDir: 0,
@@ -60,7 +60,7 @@ const PongGame = forwardRef<PongGameRef, PongGameProps>(({
     bubbleId: 0,
   });
 
-  const PADDLE_HEIGHT = 60;
+  const PADDLE_HEIGHT = 120; // doubled from 60
   const PADDLE_WIDTH = 8;
   const BALL_SIZE = 6;
   const WINNING_SCORE = 10;
@@ -290,8 +290,8 @@ const PongGame = forwardRef<PongGameRef, PongGameProps>(({
     const resetBall = (w: number, h: number) => {
       state.ballX = w / 2;
       state.ballY = h / 2;
-      state.ballVX = (Math.random() > 0.5 ? 3 : -3);
-      state.ballVY = (Math.random() - 0.5) * 4;
+      state.ballVX = (Math.random() > 0.5 ? 1.8 : -1.8); // 60% speed
+      state.ballVY = (Math.random() - 0.5) * 2.4; // 60% speed
     };
 
     if (gameStarted) {
@@ -310,20 +310,17 @@ const PongGame = forwardRef<PongGameRef, PongGameProps>(({
           <h2 className="text-xs font-bold bit-text pixel-text uppercase">
             HEY {recipientName.toUpperCase().slice(0, 8)}!
           </h2>
-          <p className="text-[10px] bit-text opacity-70">
-            {senderName} wants to say sorry for:
+          <p className="text-[10px] bit-text opacity-70 px-4">
+            {senderName} has prepared a surprise challenge for you.
           </p>
-          <p className="text-xs font-bold bit-text px-2 py-1 border-2 border-current inline-block">
-            "{reason.slice(0, 40)}{reason.length > 40 ? '...' : ''}"
+          <p className="text-[10px] bit-text opacity-70">
+            Accept to beat them!
           </p>
           <div className="pt-3">
             <span className="text-[10px] bit-text animate-blink-cursor">
               ▶ PRESS A TO START
             </span>
           </div>
-          <p className="text-[9px] bit-text opacity-50 pt-2">
-            Beat {senderName} to accept!
-          </p>
         </div>
       </div>
     );
