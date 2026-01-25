@@ -78,10 +78,19 @@
   body {
     @apply bg-background text-foreground font-nunito antialiased;
     overflow: hidden;
+    touch-action: pan-x pan-y;
   }
 
   html {
     scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  /* Prevent zoom on all form inputs */
+  input, textarea, select, button {
+    font-size: 16px !important;
+    touch-action: manipulation;
   }
 }
 
