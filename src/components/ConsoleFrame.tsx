@@ -77,11 +77,11 @@ const ConsoleFrame = ({
                   />
                 </div>
               ) : (
-                <div className="dpad-plus relative w-[72px] h-[72px] opacity-50">
+                <div className="dpad-plus relative w-[79px] h-[79px] opacity-50">
                   {/* Horizontal arm */}
-                  <div className="absolute top-1/2 -translate-y-1/2 left-0 w-full h-6 bg-primary rounded-full shadow-dpad-plus" />
+                  <div className="absolute top-1/2 -translate-y-1/2 left-0 w-full h-7 bg-primary rounded-full shadow-dpad-plus" />
                   {/* Vertical arm */}
-                  <div className="absolute left-1/2 -translate-x-1/2 top-0 w-6 h-full bg-primary rounded-full shadow-dpad-plus" />
+                  <div className="absolute left-1/2 -translate-x-1/2 top-0 w-7 h-full bg-primary rounded-full shadow-dpad-plus" />
                 </div>
               )}
             </div>
