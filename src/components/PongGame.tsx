@@ -60,7 +60,7 @@ const PongGame = forwardRef<PongGameRef, PongGameProps>(({
     bubbleId: 0,
   });
 
-  const PADDLE_HEIGHT = 40;
+  const PADDLE_HEIGHT = 60;
   const PADDLE_WIDTH = 8;
   const BALL_SIZE = 6;
   const WINNING_SCORE = 10;
@@ -228,7 +228,7 @@ const PongGame = forwardRef<PongGameRef, PongGameProps>(({
 
         if (timestamp - state.lastBubbleTime > 1500) {
           state.lastBubbleTime = timestamp;
-          addBubble(width - 70, state.aiY - 10);
+          addBubble(width - 100, state.aiY - 10);
         }
       }
 
@@ -253,7 +253,7 @@ const PongGame = forwardRef<PongGameRef, PongGameProps>(({
           return newScore;
         });
         resetBall(width, height);
-        addBubble(width - 70, state.aiY);
+        addBubble(width - 100, state.aiY);
       }
 
       // Draw paddles (chunky pixels)
