@@ -42,7 +42,7 @@ const Play = () => {
       key: 'ArrowDown'
     }));
   }}>
-      {gameState === 'playing' ? <PongGame senderName={senderName} recipientName={recipientName} reason={reason} onGameEnd={handleGameEnd} /> : <GameEndScreen senderName={senderName} recipientName={recipientName} winner={winner} />}
+      {gameState === 'playing' ? <PongGame senderName={senderName} recipientName={recipientName} reason={reason} onGameEnd={handleGameEnd} /> : <GameEndScreen senderName={senderName} recipientName={recipientName} reason={reason} winner={winner} onBack={() => setGameState('playing')} />}
     </ConsoleFrame>;
 };
 export default Play;

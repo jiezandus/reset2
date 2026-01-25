@@ -1,29 +1,36 @@
 import { useState } from 'react';
 import { Share2, Copy, Check } from 'lucide-react';
 
+type GamePhase = 'apology' | 'reply' | 'success';
+
 interface GameEndScreenProps {
   senderName: string;
   recipientName: string;
+  reason: string;
   winner: 'recipient' | 'sender';
+  onBack?: () => void;
 }
 
-const REPLY_MESSAGES = [
-  { text: "ACCEPTED!" },
-  { text: "FORGIVEN!" },
-  { text: "WE'RE GOOD!" },
-  { text: "GG!" },
-  { text: "MISSED U!" },
+const REPLY_OPTIONS = [
+  { id: 'ok', text: "I'm actually ok. Don't worry.", shortText: "ALL GOOD" },
+  { id: 'talk', text: "Apology accepted. Let's talk.", shortText: "LET'S TALK" },
+  { id: 'time', text: "Give me more time.", shortText: "NEED TIME" },
 ];
 
-const GameEndScreen = ({ senderName, recipientName, winner }: GameEndScreenProps) => {
-  const [selectedReply, setSelectedReply] = useState<number | null>(null);
+const GameEndScreen = ({ senderName, recipientName, reason, winner, onBack }: GameEndScreenProps) => {
+  const [phase, setPhase] = useState<GamePhase>('apology');
+  const [selectedReply, setSelectedReply] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
-  const handleShare = async () => {
-    if (selectedReply === null) return;
+  const selectedOption = REPLY_OPTIONS.find(opt => opt.id === selectedReply);
 
-    const reply = REPLY_MESSAGES[selectedReply];
-    const shareText = `From ${recipientName}: "${reply.text}" — via RESET`;
+  const getShareMessage = () => {
+    if (!selectedOption) return '';
+    return `Hey ${senderName}! 💌\n\n${recipientName} played your challenge and here's their response:\n\n"${selectedOption.text}"\n\n— via RESET`;
+  };
+
+  const handleShare = async () => {
+    const shareText = getShareMessage();
 
     if (navigator.share) {
       try {
@@ -43,81 +50,36 @@ const GameEndScreen = ({ senderName, recipientName, winner }: GameEndScreenProps
     try {
       await navigator.clipboard.writeText(text);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      setTimeout(() => {
+        setCopied(false);
+        setPhase('success');
+      }, 500);
     } catch (err) {
       console.error('Failed to copy:', err);
     }
   };
 
-  return (
-    <div className="w-full h-full flex flex-col items-center justify-center p-4 text-center bit-bg">
-      {winner === 'recipient' ? (
-        <div className="flex flex-col items-center animate-pop-in">
-          {/* Pixel heart */}
-          <div className="inline-block mb-3 animate-bounce-soft">
-            <div className="flex justify-center gap-[2px]">
-              <div className="w-3 h-3 bit-fg" />
-              <div className="w-3 h-3" />
-              <div className="w-3 h-3 bit-fg" />
-            </div>
-            <div className="flex justify-center gap-[2px]">
-              <div className="w-3 h-3 bit-fg" />
-              <div className="w-3 h-3 bit-fg" />
-              <div className="w-3 h-3 bit-fg" />
-            </div>
-            <div className="flex justify-center gap-[2px] mt-[2px]">
-              <div className="w-3 h-3" />
-              <div className="w-3 h-3 bit-fg" />
-              <div className="w-3 h-3" />
-            </div>
-          </div>
-          
-          <h2 className="text-sm font-bold bit-text pixel-text uppercase mb-1">
-            You Won!
-          </h2>
-          <p className="text-[10px] bit-text opacity-60 mb-4">
-            {senderName}'s apology accepted
-          </p>
+  const handleContinueToReply = () => {
+    setPhase('reply');
+  };
 
-          <p className="text-[9px] bit-text uppercase tracking-wide mb-2">
-            Send a reply:
-          </p>
+  const handleSelectReply = (replyId: string) => {
+    setSelectedReply(replyId);
+  };
 
-          <div className="flex flex-wrap justify-center gap-1.5 mb-4 max-w-full">
-            {REPLY_MESSAGES.map((msg, idx) => (
-              <button
-                key={idx}
-                onClick={() => setSelectedReply(idx)}
-                className={`px-2 py-1.5 text-[9px] font-bold transition-all ${
-                  selectedReply === idx 
-                    ? 'bit-button scale-105' 
-                    : 'bit-button-outline'
-                }`}
-              >
-                {msg.text}
-              </button>
-            ))}
-          </div>
+  const handleBackFromReply = () => {
+    setPhase('apology');
+    setSelectedReply(null);
+  };
 
-          <button
-            onClick={handleShare}
-            disabled={selectedReply === null}
-            className="bit-button px-4 py-2 text-xs flex items-center gap-2"
-          >
-            {copied ? (
-              <>
-                <Check className="w-3 h-3" />
-                OK!
-              </>
-            ) : (
-              <>
-                <Share2 className="w-3 h-3" />
-                Share
-              </>
-            )}
-          </button>
-        </div>
-      ) : (
+  const handleBackFromSuccess = () => {
+    setPhase('reply');
+  };
+
+  // Sender won (recipient lost)
+  if (winner === 'sender') {
+    return (
+      <div className="w-full h-full flex flex-col items-center justify-center p-4 text-center bit-bg">
         <div className="flex flex-col items-center animate-pop-in">
           {/* Pixel sad face */}
           <div className="inline-block mb-3">
@@ -150,7 +112,172 @@ const GameEndScreen = ({ senderName, recipientName, winner }: GameEndScreenProps
             Try Again ►
           </button>
         </div>
-      )}
+      </div>
+    );
+  }
+
+  // Phase 1: Apology reveal
+  if (phase === 'apology') {
+    return (
+      <div className="w-full h-full flex flex-col items-center justify-center p-4 text-center bit-bg">
+        <div className="flex flex-col items-center animate-pop-in">
+          {/* Pixel heart */}
+          <div className="inline-block mb-3 animate-bounce-soft">
+            <div className="flex justify-center gap-[2px]">
+              <div className="w-3 h-3 bit-fg" />
+              <div className="w-3 h-3" />
+              <div className="w-3 h-3 bit-fg" />
+            </div>
+            <div className="flex justify-center gap-[2px]">
+              <div className="w-3 h-3 bit-fg" />
+              <div className="w-3 h-3 bit-fg" />
+              <div className="w-3 h-3 bit-fg" />
+            </div>
+            <div className="flex justify-center gap-[2px] mt-[2px]">
+              <div className="w-3 h-3" />
+              <div className="w-3 h-3 bit-fg" />
+              <div className="w-3 h-3" />
+            </div>
+          </div>
+          
+          <h2 className="text-sm font-bold bit-text pixel-text uppercase mb-1">
+            You Won!
+          </h2>
+          <p className="text-[10px] bit-text opacity-60 mb-4">
+            Here's what {senderName} wanted to say:
+          </p>
+
+          <div className="border-2 border-current px-4 py-3 mb-4 max-w-[200px]">
+            <p className="text-[9px] bit-text opacity-60 mb-1">I'm sorry for:</p>
+            <p className="text-xs font-bold bit-text">
+              "{reason.slice(0, 60)}{reason.length > 60 ? '...' : ''}"
+            </p>
+          </div>
+
+          <p className="text-[9px] bit-text opacity-50 mb-4">
+            Press B to continue
+          </p>
+
+          <button
+            onClick={handleContinueToReply}
+            className="bit-button px-4 py-2 text-xs"
+          >
+            Continue ►
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Phase 2: Reply selection
+  if (phase === 'reply') {
+    return (
+      <div className="w-full h-full flex flex-col items-center justify-center p-4 text-center bit-bg">
+        <div className="flex flex-col items-center animate-pop-in w-full max-w-[240px]">
+          <h2 className="text-sm font-bold bit-text pixel-text uppercase mb-1">
+            Your Reply
+          </h2>
+          <p className="text-[10px] bit-text opacity-60 mb-4">
+            How do you want to respond?
+          </p>
+
+          <div className="flex flex-col gap-2 w-full mb-4">
+            {REPLY_OPTIONS.map((option) => (
+              <button
+                key={option.id}
+                onClick={() => handleSelectReply(option.id)}
+                className={`px-3 py-2.5 text-[10px] text-left transition-all ${
+                  selectedReply === option.id 
+                    ? 'bit-button' 
+                    : 'bit-button-outline'
+                }`}
+              >
+                {option.text}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex gap-2 w-full">
+            <button
+              onClick={handleBackFromReply}
+              className="bit-button-outline flex-1 px-3 py-2 text-[10px]"
+            >
+              ← Back
+            </button>
+            <button
+              onClick={handleShare}
+              disabled={!selectedReply}
+              className="bit-button flex-1 px-3 py-2 text-[10px] flex items-center justify-center gap-1"
+            >
+              {copied ? (
+                <>
+                  <Check className="w-3 h-3" />
+                  OK!
+                </>
+              ) : (
+                <>
+                  <Copy className="w-3 h-3" />
+                  Copy & Send
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Phase 3: Success / Congratulation
+  return (
+    <div className="w-full h-full flex flex-col items-center justify-center p-4 text-center bit-bg">
+      <div className="flex flex-col items-center animate-pop-in">
+        {/* Pixel sparkles */}
+        <div className="inline-block mb-4 animate-bounce-soft">
+          <div className="flex justify-center gap-2 mb-1">
+            <div className="w-1 h-1 bit-fg" />
+            <div className="w-2 h-2 bit-fg" />
+            <div className="w-1 h-1 bit-fg" />
+          </div>
+          <div className="flex justify-center gap-1">
+            <div className="w-2 h-2 bit-fg" />
+            <div className="w-3 h-3 bit-fg" />
+            <div className="w-2 h-2 bit-fg" />
+          </div>
+          <div className="flex justify-center gap-2 mt-1">
+            <div className="w-1 h-1 bit-fg" />
+            <div className="w-2 h-2 bit-fg" />
+            <div className="w-1 h-1 bit-fg" />
+          </div>
+        </div>
+        
+        <h2 className="text-sm font-bold bit-text pixel-text uppercase mb-2">
+          Message Sent!
+        </h2>
+        <p className="text-[10px] bit-text opacity-70 mb-3 px-4">
+          Your response has been copied. Now paste it in your chat with {senderName}!
+        </p>
+
+        {selectedOption && (
+          <div className="border-2 border-current px-4 py-2 mb-4 max-w-[200px]">
+            <p className="text-[9px] bit-text opacity-60 mb-1">You said:</p>
+            <p className="text-[10px] bit-text">"{selectedOption.text}"</p>
+          </div>
+        )}
+
+        <p className="text-[10px] bit-text opacity-60 mb-1">
+          Now let's wait for their response...
+        </p>
+        <p className="text-[10px] bit-text opacity-50 mb-4">
+          Good luck! 🍀
+        </p>
+
+        <button
+          onClick={handleBackFromSuccess}
+          className="bit-button-outline px-4 py-2 text-[10px]"
+        >
+          ← Back
+        </button>
+      </div>
     </div>
   );
 };
