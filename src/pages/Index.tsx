@@ -107,12 +107,20 @@ const Index = () => {
               Good luck! 🍀
             </p>
             
-            <button
-              onClick={resetAll}
-              className="bit-button-outline px-4 py-2 text-[10px]"
-            >
-              Create Another
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setShowSuccess(false)}
+                className="bit-button-outline px-4 py-2 text-[10px]"
+              >
+                ← Back
+              </button>
+              <button
+                onClick={resetAll}
+                className="bit-button px-4 py-2 text-[10px]"
+              >
+                Create Another
+              </button>
+            </div>
           </div>
         ) : !generatedLink ? (
           <div className="flex-1 flex flex-col animate-slide-up">
