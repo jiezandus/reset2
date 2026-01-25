@@ -200,18 +200,6 @@ const Index = () => {
                 ← Back
               </button>
             </div>
-
-            <button
-              onClick={() => {
-                setGeneratedLink('');
-                setSenderName('');
-                setRecipientName('');
-                setReason('');
-              }}
-              className="bit-text text-[10px] mt-3 underline opacity-60 hover:opacity-100 transition-opacity"
-            >
-              ← Create another
-            </button>
           </div>
         )}
       </div>
