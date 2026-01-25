@@ -43,9 +43,11 @@ const Index = () => {
     }
   };
 
+  const shareMessage = `Hey ${recipientName}! 👀✨ Someone has something to say to you... Open this to find out! ${generatedLink}`;
+
   const copyToClipboard = async () => {
     try {
-      await navigator.clipboard.writeText(generatedLink);
+      await navigator.clipboard.writeText(shareMessage);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
@@ -160,9 +162,11 @@ const Index = () => {
               </p>
             </div>
 
-            {/* Link display */}
-            <div className="flex-1 border-3 border-current p-2 text-[8px] bit-text font-mono break-all overflow-auto" style={{ borderWidth: '3px', borderColor: 'hsl(40 10% 10%)' }}>
-              {generatedLink}
+            {/* Message preview */}
+            <div className="flex-1 border-3 border-current p-3 text-[10px] bit-text break-all overflow-auto" style={{ borderWidth: '3px', borderColor: 'hsl(40 10% 10%)' }}>
+              <p className="mb-2">Hey {recipientName}! 👀✨</p>
+              <p className="mb-2">Someone has something to say to you...</p>
+              <p className="opacity-60 font-mono text-[8px]">{generatedLink}</p>
             </div>
 
             {/* Action buttons */}
