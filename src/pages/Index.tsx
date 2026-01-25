@@ -156,7 +156,7 @@ const Index = () => {
               </div>
               <h2 className="text-sm font-bold bit-text pixel-text uppercase">Ready!</h2>
               <p className="text-[10px] bit-text opacity-60 mt-1">
-                Send to {recipientName}
+                Send to {recipientName} via your messaging app
               </p>
             </div>
 
