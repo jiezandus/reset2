@@ -1,7 +1,7 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import ConsoleFrame from '@/components/ConsoleFrame';
-import PongGame from '@/components/PongGame';
+import PongGame, { PongGameRef } from '@/components/PongGame';
 import GameEndScreen from '@/components/GameEndScreen';
 
 const Play = () => {
@@ -9,7 +9,7 @@ const Play = () => {
   const navigate = useNavigate();
   const [gameState, setGameState] = useState<'playing' | 'ended'>('playing');
   const [winner, setWinner] = useState<'recipient' | 'sender'>('recipient');
-  const [playerDir, setPlayerDir] = useState<'up' | 'down' | null>(null);
+  const gameRef = useRef<PongGameRef>(null);
 
   const senderName = searchParams.get('sender') || 'Someone';
   const recipientName = searchParams.get('recipient') || 'Friend';
@@ -24,17 +24,17 @@ const Play = () => {
   if (!searchParams.get('sender') || !searchParams.get('recipient')) {
     return (
       <ConsoleFrame>
-        <div className="p-6 bg-screen min-h-[300px] flex flex-col items-center justify-center text-center">
-          <p className="text-4xl mb-3">🤔</p>
-          <h2 className="text-xl font-bold text-foreground mb-2">Invalid Link</h2>
-          <p className="text-sm text-muted-foreground mb-4">
-            This game link seems to be broken.
+        <div className="p-4 min-h-full flex flex-col items-center justify-center text-center" style={{ backgroundColor: '#c4cfa1' }}>
+          <p className="text-3xl mb-2">🤔</p>
+          <h2 className="text-sm font-bold text-foreground mb-1 pixel-text">INVALID LINK</h2>
+          <p className="text-xs text-muted-foreground mb-3">
+            This game link is broken.
           </p>
           <button
             onClick={() => navigate('/')}
-            className="action-button px-5 py-2.5 rounded-xl font-bold text-foreground"
+            className="action-button px-4 py-2 rounded-lg font-bold text-foreground text-sm"
           >
-            Create New Game
+            Create New
           </button>
         </div>
       </ConsoleFrame>
@@ -44,16 +44,15 @@ const Play = () => {
   return (
     <ConsoleFrame
       showDpad={gameState === 'playing'}
-      onDpadUp={() => {
-        // Trigger keyboard event for game
-        window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp' }));
-      }}
-      onDpadDown={() => {
-        window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown' }));
-      }}
+      onDpadUp={() => gameRef.current?.moveUp()}
+      onDpadDown={() => gameRef.current?.moveDown()}
+      onDpadRelease={() => gameRef.current?.stopMove()}
+      onButtonA={() => gameRef.current?.startGame()}
+      onButtonB={() => navigate('/')}
     >
       {gameState === 'playing' ? (
         <PongGame
+          ref={gameRef}
           senderName={senderName}
           recipientName={recipientName}
           reason={reason}

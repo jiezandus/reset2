@@ -55,18 +55,18 @@ const Index = () => {
 
   return (
     <ConsoleFrame>
-      <div className="p-6 bg-screen min-h-[300px]">
+      <div className="p-4 h-full flex flex-col" style={{ backgroundColor: '#c4cfa1' }}>
         {!generatedLink ? (
-          <div className="space-y-4 animate-slide-up">
-            <div className="text-center mb-6">
-              <Heart className="w-8 h-8 text-primary mx-auto mb-2 animate-bounce-soft" fill="currentColor" />
-              <h1 className="text-xl font-bold text-foreground">Break the Ice</h1>
-              <p className="text-sm text-muted-foreground">Create an apology game</p>
+          <div className="flex-1 flex flex-col animate-slide-up">
+            <div className="text-center mb-3">
+              <Heart className="w-6 h-6 text-foreground mx-auto mb-1 animate-bounce-soft" fill="currentColor" />
+              <h1 className="text-sm font-bold text-foreground pixel-text">BREAK THE ICE</h1>
+              <p className="text-xs text-muted-foreground">Create an apology game</p>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-2 flex-1">
               <div>
-                <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">
                   Your Name
                 </label>
                 <input
@@ -74,12 +74,12 @@ const Index = () => {
                   value={senderName}
                   onChange={(e) => setSenderName(e.target.value)}
                   placeholder="Enter your name"
-                  className="playdate-input w-full px-4 py-3 rounded-xl text-foreground font-medium focus:outline-none"
+                  className="playdate-input w-full px-3 py-2 rounded-lg text-foreground text-sm font-medium focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">
                   Their Name
                 </label>
                 <input
@@ -87,12 +87,12 @@ const Index = () => {
                   value={recipientName}
                   onChange={(e) => setRecipientName(e.target.value)}
                   placeholder="Who are you apologizing to?"
-                  className="playdate-input w-full px-4 py-3 rounded-xl text-foreground font-medium focus:outline-none"
+                  className="playdate-input w-full px-3 py-2 rounded-lg text-foreground text-sm font-medium focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">
                   What happened?
                 </label>
                 <textarea
@@ -100,7 +100,7 @@ const Index = () => {
                   onChange={(e) => setReason(e.target.value)}
                   placeholder="I'm sorry for..."
                   rows={2}
-                  className="playdate-input w-full px-4 py-3 rounded-xl text-foreground font-medium focus:outline-none resize-none"
+                  className="playdate-input w-full px-3 py-2 rounded-lg text-foreground text-sm font-medium focus:outline-none resize-none"
                 />
               </div>
             </div>
@@ -108,41 +108,41 @@ const Index = () => {
             <button
               onClick={generateLink}
               disabled={!senderName || !recipientName || !reason}
-              className={`action-button w-full py-3 rounded-xl font-bold text-foreground
+              className={`action-button w-full py-2.5 rounded-lg font-bold text-foreground text-sm mt-2
                 ${(!senderName || !recipientName || !reason) ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               Generate Link 🎮
             </button>
           </div>
         ) : (
-          <div className="text-center space-y-4 animate-pop-in">
-            <div className="mb-4">
-              <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-3 animate-pulse-glow">
-                <Check className="w-8 h-8 text-foreground" />
+          <div className="text-center flex flex-col h-full animate-pop-in">
+            <div className="mb-3">
+              <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center mx-auto mb-2 animate-pulse-glow">
+                <Check className="w-6 h-6 text-foreground" />
               </div>
-              <h2 className="text-xl font-bold text-foreground">Ready to Share!</h2>
-              <p className="text-sm text-muted-foreground">
-                Send this link to {recipientName}
+              <h2 className="text-sm font-bold text-foreground pixel-text">READY!</h2>
+              <p className="text-xs text-muted-foreground">
+                Send to {recipientName}
               </p>
             </div>
 
-            <div className="bg-muted rounded-xl p-3 break-all text-xs text-muted-foreground font-mono">
+            <div className="bg-card/50 rounded-lg p-2 break-all text-[10px] text-muted-foreground font-mono flex-1 overflow-auto">
               {generatedLink}
             </div>
 
-            <div className="flex gap-3">
+            <div className="flex gap-2 mt-3">
               <button
                 onClick={copyToClipboard}
-                className={`flex-1 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all
+                className={`flex-1 py-2.5 rounded-lg font-bold flex items-center justify-center gap-1.5 text-sm transition-all
                   ${copied 
-                    ? 'bg-green-500 text-white' 
-                    : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+                    ? 'bg-green-600 text-white' 
+                    : 'bg-console-shadow text-primary'
                   }`}
               >
                 {copied ? (
                   <>
                     <Check className="w-4 h-4" />
-                    Copied!
+                    OK!
                   </>
                 ) : (
                   <>
@@ -154,7 +154,7 @@ const Index = () => {
 
               <button
                 onClick={handleShare}
-                className="action-button flex-1 py-3 rounded-xl font-bold text-foreground flex items-center justify-center gap-2"
+                className="action-button flex-1 py-2.5 rounded-lg font-bold text-foreground flex items-center justify-center gap-1.5 text-sm"
               >
                 <Share2 className="w-4 h-4" />
                 Share
@@ -168,7 +168,7 @@ const Index = () => {
                 setRecipientName('');
                 setReason('');
               }}
-              className="text-muted-foreground text-sm hover:text-foreground transition-colors"
+              className="text-muted-foreground text-xs mt-2 hover:text-foreground transition-colors"
             >
               Create another →
             </button>

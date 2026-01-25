@@ -86,68 +86,66 @@
 }
 
 @layer components {
-  /* Console frame styling */
-  .console-frame {
-    background: linear-gradient(
-      145deg,
-      hsl(var(--console-body)) 0%,
-      hsl(40 10% 15%) 100%
-    );
+  /* Playdate console body */
+  .shadow-playdate {
     box-shadow: 
-      0 20px 60px -10px hsl(var(--console-shadow) / 0.5),
-      0 10px 20px -5px hsl(var(--console-shadow) / 0.3),
-      inset 0 1px 0 hsl(40 10% 30%),
-      inset 0 -2px 0 hsl(40 10% 8%);
+      0 8px 0 hsl(45 100% 42%),
+      0 12px 30px -5px hsl(0 0% 0% / 0.35),
+      inset 0 2px 0 hsl(45 100% 65%);
+  }
+
+  .shadow-screen-inset {
+    box-shadow:
+      inset 0 3px 8px hsl(0 0% 0% / 0.4),
+      inset 0 0 0 2px hsl(0 0% 0% / 0.2);
   }
 
   .console-screen {
     background: hsl(var(--screen-bg));
-    box-shadow:
-      inset 0 2px 8px hsl(var(--console-shadow) / 0.15),
-      inset 0 0 0 3px hsl(var(--screen-border));
+    image-rendering: pixelated;
   }
 
-  /* D-pad styling */
-  .dpad-container {
-    background: hsl(var(--dpad-bg));
-    box-shadow:
-      inset 0 2px 4px hsl(0 0% 0% / 0.3),
-      0 2px 0 hsl(40 10% 30%);
+  .bg-console-shadow {
+    background-color: hsl(var(--console-shadow));
   }
 
-  .dpad-button {
-    background: linear-gradient(
-      180deg,
-      hsl(var(--dpad-button)) 0%,
-      hsl(40 10% 28%) 100%
-    );
+  /* Button shadows */
+  .shadow-button {
     box-shadow:
-      inset 0 1px 0 hsl(40 10% 45%),
-      0 2px 4px hsl(0 0% 0% / 0.3);
+      0 3px 0 hsl(0 0% 0% / 0.4),
+      0 4px 8px hsl(0 0% 0% / 0.2);
   }
 
-  .dpad-button:active {
-    transform: translateY(1px);
+  .shadow-button-pressed {
     box-shadow:
-      inset 0 1px 0 hsl(40 10% 45%),
-      0 1px 2px hsl(0 0% 0% / 0.3);
+      0 1px 0 hsl(0 0% 0% / 0.4),
+      0 2px 4px hsl(0 0% 0% / 0.2);
+  }
+
+  /* D-pad cross styling */
+  .dpad-cross {
+    position: relative;
+    width: 96px;
+    height: 96px;
   }
 
   /* Speech bubble */
   .speech-bubble {
     background: hsl(var(--speech-bubble));
     position: relative;
+    image-rendering: pixelated;
+    font-family: 'Press Start 2P', monospace;
   }
 
   .speech-bubble::after {
     content: '';
     position: absolute;
-    bottom: -8px;
+    bottom: -6px;
     left: 50%;
     transform: translateX(-50%);
-    border-left: 8px solid transparent;
-    border-right: 8px solid transparent;
-    border-top: 10px solid hsl(var(--speech-bubble));
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 8px solid hsl(var(--speech-bubble));
   }
 
   /* Action button */
@@ -182,11 +180,18 @@
     background: hsl(var(--card));
     border: 3px solid hsl(var(--border));
     transition: all 0.2s ease;
+    font-family: inherit;
   }
 
   .playdate-input:focus {
     border-color: hsl(var(--primary));
     box-shadow: 0 0 0 4px hsl(var(--primary) / 0.2);
+  }
+
+  /* Pixel art styling */
+  .pixel-text {
+    font-family: 'Press Start 2P', monospace;
+    image-rendering: pixelated;
   }
 
   /* Bounce animation for game elements */
@@ -221,6 +226,11 @@
     50% { transform: rotate(3deg); }
   }
 
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
   .animate-bounce-soft {
     animation: bounce-soft 2s ease-in-out infinite;
   }
@@ -243,5 +253,9 @@
 
   .animate-wiggle {
     animation: wiggle 0.5s ease-in-out;
+  }
+
+  .animate-blink {
+    animation: blink 1s step-end infinite;
   }
 }

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback, useImperativeHandle, forwardRef } from 'react';
 import SpeechBubble from './SpeechBubble';
 
 interface PongGameProps {
@@ -6,6 +6,14 @@ interface PongGameProps {
   recipientName: string;
   reason: string;
   onGameEnd: (winner: 'recipient' | 'sender') => void;
+  onStartGame?: () => void;
+}
+
+export interface PongGameRef {
+  moveUp: () => void;
+  moveDown: () => void;
+  stopMove: () => void;
+  startGame: () => void;
 }
 
 interface Bubble {
@@ -16,19 +24,23 @@ interface Bubble {
 }
 
 const APOLOGY_MESSAGES = [
-  "I'm sorry! 😢",
-  "My bad...",
-  "Forgive me? 🥺",
-  "I messed up",
-  "Please? 💛",
-  "I was wrong",
-  "Can we talk?",
-  "Miss you 💔",
-  "I regret it",
-  "You're right",
+  "SORRY!",
+  "MY BAD",
+  "FORGIVE?",
+  "OOPS",
+  "PLEASE?",
+  "I WAS WRONG",
+  "MISS U",
+  "IM SORRY",
 ];
 
-const PongGame = ({ senderName, recipientName, reason, onGameEnd }: PongGameProps) => {
+const PongGame = forwardRef<PongGameRef, PongGameProps>(({ 
+  senderName, 
+  recipientName, 
+  reason, 
+  onGameEnd,
+  onStartGame 
+}, ref) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [recipientScore, setRecipientScore] = useState(0);
@@ -39,8 +51,8 @@ const PongGame = ({ senderName, recipientName, reason, onGameEnd }: PongGameProp
   const gameStateRef = useRef({
     ballX: 0,
     ballY: 0,
-    ballVX: 4,
-    ballVY: 3,
+    ballVX: 3,
+    ballVY: 2,
     playerY: 0,
     aiY: 0,
     playerDir: 0,
@@ -48,10 +60,11 @@ const PongGame = ({ senderName, recipientName, reason, onGameEnd }: PongGameProp
     bubbleId: 0,
   });
 
-  const PADDLE_HEIGHT = 60;
-  const PADDLE_WIDTH = 10;
-  const BALL_SIZE = 10;
+  const PADDLE_HEIGHT = 40;
+  const PADDLE_WIDTH = 6;
+  const BALL_SIZE = 6;
   const WINNING_SCORE = 10;
+  const PIXEL_SIZE = 2; // Base pixel size for retro look
 
   const addBubble = useCallback((x: number, y: number) => {
     const message = APOLOGY_MESSAGES[Math.floor(Math.random() * APOLOGY_MESSAGES.length)];
@@ -64,21 +77,36 @@ const PongGame = ({ senderName, recipientName, reason, onGameEnd }: PongGameProp
   }, []);
 
   const movePlayerUp = useCallback(() => {
-    gameStateRef.current.playerDir = -8;
+    gameStateRef.current.playerDir = -6;
   }, []);
 
   const movePlayerDown = useCallback(() => {
-    gameStateRef.current.playerDir = 8;
+    gameStateRef.current.playerDir = 6;
   }, []);
 
   const stopPlayer = useCallback(() => {
     gameStateRef.current.playerDir = 0;
   }, []);
 
+  const handleStartGame = useCallback(() => {
+    setGameStarted(true);
+    onStartGame?.();
+  }, [onStartGame]);
+
+  useImperativeHandle(ref, () => ({
+    moveUp: movePlayerUp,
+    moveDown: movePlayerDown,
+    stopMove: stopPlayer,
+    startGame: handleStartGame,
+  }));
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'ArrowUp' || e.key === 'w') movePlayerUp();
       if (e.key === 'ArrowDown' || e.key === 's') movePlayerDown();
+      if (e.key === ' ' || e.key === 'Enter') {
+        if (!gameStarted) handleStartGame();
+      }
     };
 
     const handleKeyUp = (e: KeyboardEvent) => {
@@ -92,7 +120,7 @@ const PongGame = ({ senderName, recipientName, reason, onGameEnd }: PongGameProp
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     };
-  }, [movePlayerUp, movePlayerDown, stopPlayer]);
+  }, [movePlayerUp, movePlayerDown, stopPlayer, gameStarted, handleStartGame]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -101,6 +129,9 @@ const PongGame = ({ senderName, recipientName, reason, onGameEnd }: PongGameProp
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
+
+    // Disable image smoothing for pixelated look
+    ctx.imageSmoothingEnabled = false;
 
     const width = container.clientWidth;
     const height = container.clientHeight;
@@ -117,44 +148,57 @@ const PongGame = ({ senderName, recipientName, reason, onGameEnd }: PongGameProp
     let animationId: number;
     let lastTime = 0;
 
+    // Helper function to draw pixelated rectangle
+    const drawPixelRect = (x: number, y: number, w: number, h: number, color: string) => {
+      ctx.fillStyle = color;
+      // Snap to pixel grid
+      const px = Math.floor(x / PIXEL_SIZE) * PIXEL_SIZE;
+      const py = Math.floor(y / PIXEL_SIZE) * PIXEL_SIZE;
+      const pw = Math.floor(w / PIXEL_SIZE) * PIXEL_SIZE;
+      const ph = Math.floor(h / PIXEL_SIZE) * PIXEL_SIZE;
+      ctx.fillRect(px, py, pw, ph);
+    };
+
+    // Helper function to draw pixelated circle (as square for retro look)
+    const drawPixelBall = (x: number, y: number, size: number, color: string) => {
+      ctx.fillStyle = color;
+      const px = Math.floor(x / PIXEL_SIZE) * PIXEL_SIZE;
+      const py = Math.floor(y / PIXEL_SIZE) * PIXEL_SIZE;
+      ctx.fillRect(px - size, py - size, size * 2, size * 2);
+    };
+
     const gameLoop = (timestamp: number) => {
       const deltaTime = timestamp - lastTime;
       lastTime = timestamp;
 
-      // Clear canvas
-      ctx.fillStyle = getComputedStyle(document.documentElement)
-        .getPropertyValue('--screen-bg')
-        .trim();
-      ctx.fillStyle = '#f5f0e1';
+      // Clear canvas with retro cream/green-ish background
+      ctx.fillStyle = '#c4cfa1'; // Classic LCD green tint
       ctx.fillRect(0, 0, width, height);
 
-      // Draw center line
-      ctx.setLineDash([5, 10]);
-      ctx.strokeStyle = '#d4cfc0';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(width / 2, 0);
-      ctx.lineTo(width / 2, height);
-      ctx.stroke();
-      ctx.setLineDash([]);
+      // Draw dotted center line (pixelated)
+      const dotSize = PIXEL_SIZE * 2;
+      const gap = PIXEL_SIZE * 4;
+      ctx.fillStyle = '#9ca87a';
+      for (let y = 0; y < height; y += dotSize + gap) {
+        const px = Math.floor((width / 2 - dotSize / 2) / PIXEL_SIZE) * PIXEL_SIZE;
+        ctx.fillRect(px, y, dotSize, dotSize);
+      }
 
       // Update player paddle
       state.playerY += state.playerDir;
       state.playerY = Math.max(0, Math.min(height - PADDLE_HEIGHT, state.playerY));
 
-      // AI paddle logic (intentionally bad - follows with delay and misses)
+      // AI paddle logic (intentionally bad)
       const aiCenter = state.aiY + PADDLE_HEIGHT / 2;
       const targetY = state.ballX > width * 0.5 
-        ? state.ballY + (Math.random() - 0.5) * 80 // Add randomness when ball is near
+        ? state.ballY + (Math.random() - 0.5) * 60
         : height / 2;
       
-      // AI moves slower and sometimes in wrong direction
-      const aiSpeed = 2 + Math.random() * 2;
-      if (Math.random() > 0.15) { // 85% chance to move towards ball
-        if (aiCenter < targetY - 30) state.aiY += aiSpeed;
-        else if (aiCenter > targetY + 30) state.aiY -= aiSpeed;
+      const aiSpeed = 1.5 + Math.random() * 1.5;
+      if (Math.random() > 0.2) {
+        if (aiCenter < targetY - 25) state.aiY += aiSpeed;
+        else if (aiCenter > targetY + 25) state.aiY -= aiSpeed;
       } else {
-        // Sometimes move wrong direction
         if (aiCenter < targetY) state.aiY -= aiSpeed;
         else state.aiY += aiSpeed;
       }
@@ -165,45 +209,42 @@ const PongGame = ({ senderName, recipientName, reason, onGameEnd }: PongGameProp
       state.ballY += state.ballVY;
 
       // Ball collision with top/bottom
-      if (state.ballY <= BALL_SIZE / 2 || state.ballY >= height - BALL_SIZE / 2) {
+      if (state.ballY <= BALL_SIZE || state.ballY >= height - BALL_SIZE) {
         state.ballVY *= -1;
-        state.ballY = Math.max(BALL_SIZE / 2, Math.min(height - BALL_SIZE / 2, state.ballY));
+        state.ballY = Math.max(BALL_SIZE, Math.min(height - BALL_SIZE, state.ballY));
       }
 
       // Ball collision with player paddle (left)
       if (
-        state.ballX <= PADDLE_WIDTH + BALL_SIZE / 2 + 10 &&
+        state.ballX <= PADDLE_WIDTH + BALL_SIZE + 8 &&
         state.ballY >= state.playerY &&
         state.ballY <= state.playerY + PADDLE_HEIGHT
       ) {
-        state.ballVX = Math.abs(state.ballVX) * 1.05;
-        state.ballX = PADDLE_WIDTH + BALL_SIZE / 2 + 11;
-        // Add spin based on where ball hits paddle
+        state.ballVX = Math.abs(state.ballVX) * 1.03;
+        state.ballX = PADDLE_WIDTH + BALL_SIZE + 9;
         const hitPos = (state.ballY - state.playerY) / PADDLE_HEIGHT;
-        state.ballVY = (hitPos - 0.5) * 8;
+        state.ballVY = (hitPos - 0.5) * 6;
       }
 
       // Ball collision with AI paddle (right)
       if (
-        state.ballX >= width - PADDLE_WIDTH - BALL_SIZE / 2 - 10 &&
+        state.ballX >= width - PADDLE_WIDTH - BALL_SIZE - 8 &&
         state.ballY >= state.aiY &&
         state.ballY <= state.aiY + PADDLE_HEIGHT
       ) {
         state.ballVX = -Math.abs(state.ballVX) * 1.02;
-        state.ballX = width - PADDLE_WIDTH - BALL_SIZE / 2 - 11;
+        state.ballX = width - PADDLE_WIDTH - BALL_SIZE - 9;
         const hitPos = (state.ballY - state.aiY) / PADDLE_HEIGHT;
-        state.ballVY = (hitPos - 0.5) * 6;
+        state.ballVY = (hitPos - 0.5) * 5;
 
-        // Show apology bubble
         if (timestamp - state.lastBubbleTime > 1500) {
           state.lastBubbleTime = timestamp;
-          addBubble(width - 80, state.aiY - 10);
+          addBubble(width - 60, state.aiY - 10);
         }
       }
 
       // Scoring
       if (state.ballX < 0) {
-        // AI scored (this should be rare)
         setSenderScore(prev => {
           const newScore = prev + 1;
           if (newScore >= WINNING_SCORE) {
@@ -214,7 +255,6 @@ const PongGame = ({ senderName, recipientName, reason, onGameEnd }: PongGameProp
         });
         resetBall(width, height);
       } else if (state.ballX > width) {
-        // Player scored!
         setRecipientScore(prev => {
           const newScore = prev + 1;
           if (newScore >= WINNING_SCORE) {
@@ -224,38 +264,33 @@ const PongGame = ({ senderName, recipientName, reason, onGameEnd }: PongGameProp
           return newScore;
         });
         resetBall(width, height);
-        // Show celebration bubble
-        addBubble(width - 80, state.aiY);
+        addBubble(width - 60, state.aiY);
       }
 
-      // Draw paddles
-      ctx.fillStyle = '#2d2a26';
-      // Player paddle (left)
-      ctx.beginPath();
-      ctx.roundRect(10, state.playerY, PADDLE_WIDTH, PADDLE_HEIGHT, 5);
-      ctx.fill();
-      // AI paddle (right)
-      ctx.beginPath();
-      ctx.roundRect(width - PADDLE_WIDTH - 10, state.aiY, PADDLE_WIDTH, PADDLE_HEIGHT, 5);
-      ctx.fill();
+      // Draw paddles (dark color for LCD look)
+      const paddleColor = '#1a1a1a';
+      drawPixelRect(8, state.playerY, PADDLE_WIDTH, PADDLE_HEIGHT, paddleColor);
+      drawPixelRect(width - PADDLE_WIDTH - 8, state.aiY, PADDLE_WIDTH, PADDLE_HEIGHT, paddleColor);
 
       // Draw ball
-      ctx.beginPath();
-      ctx.arc(state.ballX, state.ballY, BALL_SIZE, 0, Math.PI * 2);
-      ctx.fill();
+      drawPixelBall(state.ballX, state.ballY, BALL_SIZE, paddleColor);
 
-      // Draw scores
-      ctx.font = 'bold 24px Nunito';
+      // Draw scores (pixelated)
+      ctx.font = 'bold 16px monospace';
       ctx.textAlign = 'center';
-      ctx.fillStyle = '#b8b3a4';
-      ctx.fillText(recipientScore.toString(), width / 4, 40);
-      ctx.fillText(senderScore.toString(), (width / 4) * 3, 40);
+      ctx.fillStyle = '#1a1a1a';
+      
+      // Score display
+      ctx.fillText(recipientScore.toString(), width / 4, 24);
+      ctx.fillText(senderScore.toString(), (width / 4) * 3, 24);
 
-      // Draw player names
-      ctx.font = '12px Nunito';
-      ctx.fillStyle = '#8a857a';
-      ctx.fillText(recipientName, width / 4, 60);
-      ctx.fillText(senderName, (width / 4) * 3, 60);
+      // Player names (smaller)
+      ctx.font = '8px monospace';
+      ctx.fillStyle = '#4a4a4a';
+      const shortRecipient = recipientName.slice(0, 8).toUpperCase();
+      const shortSender = senderName.slice(0, 8).toUpperCase();
+      ctx.fillText(shortRecipient, width / 4, 38);
+      ctx.fillText(shortSender, (width / 4) * 3, 38);
 
       animationId = requestAnimationFrame(gameLoop);
     };
@@ -263,8 +298,8 @@ const PongGame = ({ senderName, recipientName, reason, onGameEnd }: PongGameProp
     const resetBall = (w: number, h: number) => {
       state.ballX = w / 2;
       state.ballY = h / 2;
-      state.ballVX = (Math.random() > 0.5 ? 4 : -4);
-      state.ballVY = (Math.random() - 0.5) * 6;
+      state.ballVX = (Math.random() > 0.5 ? 3 : -3);
+      state.ballVY = (Math.random() - 0.5) * 4;
     };
 
     if (gameStarted) {
@@ -278,25 +313,26 @@ const PongGame = ({ senderName, recipientName, reason, onGameEnd }: PongGameProp
 
   if (!gameStarted) {
     return (
-      <div className="relative w-full aspect-[4/3] bg-screen flex flex-col items-center justify-center p-6 text-center">
-        <h2 className="text-xl font-bold text-foreground mb-2">
-          Hey {recipientName}! 👋
-        </h2>
-        <p className="text-muted-foreground mb-4">
-          {senderName} wants to say sorry for:
-        </p>
-        <p className="text-foreground font-semibold mb-6 italic">
-          "{reason}"
-        </p>
-        <button
-          onClick={() => setGameStarted(true)}
-          className="action-button px-6 py-3 rounded-xl font-bold text-foreground"
-        >
-          Let's Play! 🎮
-        </button>
-        <p className="text-xs text-muted-foreground mt-4">
-          Beat {senderName} in Pong to accept the apology
-        </p>
+      <div className="relative w-full h-full flex flex-col items-center justify-center p-4 text-center" style={{ backgroundColor: '#c4cfa1' }}>
+        <div className="space-y-3 animate-slide-up">
+          <h2 className="text-lg font-bold text-foreground pixel-text" style={{ fontSize: '12px' }}>
+            HEY {recipientName.toUpperCase().slice(0, 10)}!
+          </h2>
+          <p className="text-xs text-muted-foreground">
+            {senderName} wants to say sorry for:
+          </p>
+          <p className="text-sm font-semibold text-foreground italic px-2">
+            "{reason.slice(0, 50)}{reason.length > 50 ? '...' : ''}"
+          </p>
+          <div className="pt-2">
+            <span className="text-xs text-muted-foreground animate-blink">
+              ▶ PRESS A TO START
+            </span>
+          </div>
+          <p className="text-[10px] text-muted-foreground pt-2">
+            Beat {senderName} to accept!
+          </p>
+        </div>
       </div>
     );
   }
@@ -304,19 +340,10 @@ const PongGame = ({ senderName, recipientName, reason, onGameEnd }: PongGameProp
   return (
     <div 
       ref={containerRef} 
-      className="relative w-full aspect-[4/3] bg-screen"
-      onTouchStart={(e) => {
-        const touch = e.touches[0];
-        const rect = containerRef.current?.getBoundingClientRect();
-        if (rect) {
-          const y = touch.clientY - rect.top;
-          if (y < rect.height / 2) movePlayerUp();
-          else movePlayerDown();
-        }
-      }}
-      onTouchEnd={stopPlayer}
+      className="relative w-full h-full"
+      style={{ backgroundColor: '#c4cfa1' }}
     >
-      <canvas ref={canvasRef} className="w-full h-full" />
+      <canvas ref={canvasRef} className="w-full h-full" style={{ imageRendering: 'pixelated' }} />
       {bubbles.map(bubble => (
         <SpeechBubble
           key={bubble.id}
@@ -328,6 +355,8 @@ const PongGame = ({ senderName, recipientName, reason, onGameEnd }: PongGameProp
       ))}
     </div>
   );
-};
+});
+
+PongGame.displayName = 'PongGame';
 
 export default PongGame;
