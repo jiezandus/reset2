@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { forwardRef, useImperativeHandle, useState } from 'react';
 import { Share2, Copy, Check } from 'lucide-react';
 
 type GamePhase = 'apology' | 'reply' | 'success';
@@ -11,13 +11,18 @@ interface GameEndScreenProps {
   onBack?: () => void;
 }
 
+export interface GameEndScreenRef {
+  pressB: () => void;
+}
+
 const REPLY_OPTIONS = [
   { id: 'ok', text: "I'm actually ok. Don't worry.", shortText: "ALL GOOD" },
   { id: 'talk', text: "Apology accepted. Let's talk.", shortText: "LET'S TALK" },
   { id: 'time', text: "Give me more time. I'll reach out.", shortText: "NEED TIME" },
 ];
 
-const GameEndScreen = ({ senderName, recipientName, reason, winner, onBack }: GameEndScreenProps) => {
+const GameEndScreen = forwardRef<GameEndScreenRef, GameEndScreenProps>(
+  ({ senderName, recipientName, reason, winner, onBack }, ref) => {
   const [phase, setPhase] = useState<GamePhase>('apology');
   const [selectedReply, setSelectedReply] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
@@ -76,6 +81,20 @@ const GameEndScreen = ({ senderName, recipientName, reason, winner, onBack }: Ga
   const handleBackFromSuccess = () => {
     setPhase('reply');
   };
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      pressB: () => {
+        if (winner === 'sender') return;
+
+        if (phase === 'apology') return handleContinueToReply();
+        if (phase === 'reply') return handleBackFromReply();
+        return handleBackFromSuccess();
+      },
+    }),
+    [phase, winner]
+  );
 
   // Sender won (recipient lost)
   if (winner === 'sender') {
@@ -282,6 +301,8 @@ const GameEndScreen = ({ senderName, recipientName, reason, winner, onBack }: Ga
       </div>
     </div>
   );
-};
+});
+
+GameEndScreen.displayName = 'GameEndScreen';
 
 export default GameEndScreen;
