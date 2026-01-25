@@ -1,8 +1,10 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useMemo } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import ConsoleFrame from '@/components/ConsoleFrame';
 import PongGame from '@/components/PongGame';
 import GameEndScreen, { type GameEndScreenRef } from '@/components/GameEndScreen';
+import { decodeGameData } from '@/lib/urlEncoder';
+
 const Play = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -10,16 +12,31 @@ const Play = () => {
   const [winner, setWinner] = useState<'recipient' | 'sender'>('recipient');
   const [playerDir, setPlayerDir] = useState<'up' | 'down' | null>(null);
   const endScreenRef = useRef<GameEndScreenRef | null>(null);
-  const senderName = searchParams.get('sender') || 'Someone';
-  const recipientName = searchParams.get('recipient') || 'Friend';
-  const reason = searchParams.get('reason') || 'something';
+
+  // Decode the obscured game data
+  const gameData = useMemo(() => {
+    const encoded = searchParams.get('d');
+    if (encoded) {
+      return decodeGameData(encoded);
+    }
+    // Fallback to legacy plain params for old links
+    return {
+      sender: searchParams.get('sender') || '',
+      recipient: searchParams.get('recipient') || '',
+      reason: searchParams.get('reason') || '',
+    };
+  }, [searchParams]);
+
+  const senderName = gameData?.sender || 'Someone';
+  const recipientName = gameData?.recipient || 'Friend';
+  const reason = gameData?.reason || 'something';
   const handleGameEnd = useCallback((gameWinner: 'recipient' | 'sender') => {
     setWinner(gameWinner);
     setGameState('ended');
   }, []);
 
   // Validate that we have the required params
-  if (!searchParams.get('sender') || !searchParams.get('recipient')) {
+  if (!gameData?.sender || !gameData?.recipient) {
     return <ConsoleFrame>
         <div className="p-6 min-h-[300px] flex flex-col items-center justify-center text-center bg-secondary">
           <p className="text-4xl mb-3">🤔</p>
