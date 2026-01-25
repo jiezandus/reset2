@@ -47,6 +47,8 @@ const GameEndScreen = forwardRef<GameEndScreenRef, GameEndScreenProps>(
           title: 'RESET - Reply',
           text: shareText,
         });
+        // Navigate to success after sharing
+        setPhase('success');
       } catch (err) {
         copyToClipboard(shareText);
       }
