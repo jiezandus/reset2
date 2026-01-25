@@ -22,6 +22,10 @@ const GameEndScreen = ({ senderName, recipientName, reason, winner, onBack }: Ga
   const [selectedReply, setSelectedReply] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
+  const handleContinueToReply = () => {
+    setPhase('reply');
+  };
+
   const selectedOption = REPLY_OPTIONS.find(opt => opt.id === selectedReply);
 
   const getShareMessage = () => {
@@ -59,9 +63,6 @@ const GameEndScreen = ({ senderName, recipientName, reason, winner, onBack }: Ga
     }
   };
 
-  const handleContinueToReply = () => {
-    setPhase('reply');
-  };
 
   const handleSelectReply = (replyId: string) => {
     setSelectedReply(replyId);
@@ -143,22 +144,28 @@ const GameEndScreen = ({ senderName, recipientName, reason, winner, onBack }: Ga
           <h2 className="text-sm font-bold bit-text pixel-text uppercase mb-1">
             You Won!
           </h2>
+          <p className="text-[10px] bit-text opacity-60 mb-1">
+            10 out of 10! 🏆
+          </p>
           <p className="text-[10px] bit-text opacity-60 mb-4">
             Here's what {senderName} wanted to say:
           </p>
 
-          <div className="border-2 border-current px-4 py-3 mb-4 max-w-[200px]">
+          <div className="border-2 border-current px-4 py-3 mb-4 max-w-[220px]">
             <p className="text-xs bit-text">
-              {reason.slice(0, 80)}{reason.length > 80 ? '...' : ''}
+              I am sorry for {reason.slice(0, 70)}{reason.length > 70 ? '...' : ''}
             </p>
           </div>
 
           <p className="text-[9px] bit-text opacity-50">
             Would you like to send a reply?
           </p>
-          <p className="text-[10px] bit-text opacity-70 mt-1 animate-blink-cursor">
+          <button 
+            onClick={handleContinueToReply}
+            className="text-[10px] bit-text opacity-70 mt-2 animate-blink-cursor hover:opacity-100 transition-opacity"
+          >
             Press Ⓑ to continue
-          </p>
+          </button>
         </div>
       </div>
     );
