@@ -88,9 +88,18 @@
   }
 
   /* Prevent zoom on all form inputs */
-  input, textarea, select, button {
+  input, textarea, select {
     font-size: 16px !important;
     touch-action: manipulation;
+  }
+
+  /* Make buttons unselectable */
+  button {
+    font-size: 16px !important;
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
   }
 }
 
