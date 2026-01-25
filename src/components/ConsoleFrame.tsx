@@ -129,10 +129,6 @@ const ConsoleFrame = ({
           </div>
         </div>
 
-        {/* Side crank decoration (like Playdate) */}
-        <div className="absolute -right-1 top-24 w-5 h-12 bg-primary rounded-r-lg shadow-crank flex items-center justify-center">
-          <div className="w-2.5 h-8 bg-console-shadow rounded-full shadow-inner" />
-        </div>
       </div>
     </div>
   );
