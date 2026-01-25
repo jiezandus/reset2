@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Copy, Check, Share2 } from 'lucide-react';
 import ConsoleFrame from '@/components/ConsoleFrame';
+import { encodeGameData } from '@/lib/urlEncoder';
 
 const Index = () => {
   const [senderName, setSenderName] = useState('');
@@ -13,14 +14,14 @@ const Index = () => {
   const generateLink = () => {
     if (!senderName || !recipientName || !reason) return;
     
-    const params = new URLSearchParams({
+    const encoded = encodeGameData({
       sender: senderName,
       recipient: recipientName,
       reason: reason,
     });
     
     const baseUrl = window.location.origin;
-    const link = `${baseUrl}/play?${params.toString()}`;
+    const link = `${baseUrl}/play?d=${encoded}`;
     setGeneratedLink(link);
   };
 
