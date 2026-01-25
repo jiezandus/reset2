@@ -189,11 +189,15 @@ const Index = () => {
               </button>
 
               <button
-                onClick={handleShare}
+                onClick={() => {
+                  setGeneratedLink('');
+                  setSenderName('');
+                  setRecipientName('');
+                  setReason('');
+                }}
                 className="bit-button flex-1 py-3 text-xs flex items-center justify-center gap-2"
               >
-                <Share2 className="w-3 h-3" />
-                Share
+                ← Back
               </button>
             </div>
 
