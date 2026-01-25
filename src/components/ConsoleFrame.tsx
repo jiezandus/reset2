@@ -45,12 +45,12 @@ const ConsoleFrame = ({
 
           {/* Controls area - fixed at bottom */}
           <div className="flex items-center justify-between px-4 pb-6 pt-2">
-            {/* D-pad */}
+            {/* D-pad - unified cross shape */}
             <div className="relative">
               {showDpad ? (
-                <div className="dpad-container relative w-20 h-20">
-                  {/* Vertical bar */}
-                  <div className="absolute left-1/2 -translate-x-1/2 w-7 h-20 bg-primary rounded-md flex flex-col shadow-dpad-extruded">
+                <div className="dpad-cross-unified relative w-20 h-20 shadow-dpad-extruded rounded-md">
+                  {/* Cross shape using clip-path */}
+                  <div className="absolute inset-0 bg-primary dpad-cross-shape">
                     {/* Up button */}
                     <button
                       onTouchStart={(e) => { e.preventDefault(); onDpadUp?.(); }}
@@ -58,10 +58,10 @@ const ConsoleFrame = ({
                       onMouseDown={onDpadUp}
                       onMouseUp={onDpadRelease}
                       onMouseLeave={onDpadRelease}
-                      className="flex-1 flex items-center justify-center active:bg-black/10 rounded-t-md transition-colors"
+                      className="absolute top-0 left-1/2 -translate-x-1/2 w-7 h-[26px] flex items-center justify-center active:bg-black/10 transition-colors"
                       aria-label="Move up"
                     >
-                      <div className="w-0 h-0 border-l-[5px] border-r-[5px] border-b-[7px] border-l-transparent border-r-transparent border-b-foreground/60" />
+                      <div className="w-0 h-0 border-l-[5px] border-r-[5px] border-b-[7px] border-l-transparent border-r-transparent border-b-console-shadow/50" />
                     </button>
                     {/* Down button */}
                     <button
@@ -70,41 +70,31 @@ const ConsoleFrame = ({
                       onMouseDown={onDpadDown}
                       onMouseUp={onDpadRelease}
                       onMouseLeave={onDpadRelease}
-                      className="flex-1 flex items-center justify-center active:bg-black/10 rounded-b-md transition-colors"
+                      className="absolute bottom-0 left-1/2 -translate-x-1/2 w-7 h-[26px] flex items-center justify-center active:bg-black/10 transition-colors"
                       aria-label="Move down"
                     >
-                      <div className="w-0 h-0 border-l-[5px] border-r-[5px] border-t-[7px] border-l-transparent border-r-transparent border-t-foreground/60" />
+                      <div className="w-0 h-0 border-l-[5px] border-r-[5px] border-t-[7px] border-l-transparent border-r-transparent border-t-console-shadow/50" />
                     </button>
-                  </div>
-                  {/* Horizontal bar */}
-                  <div className="absolute top-1/2 -translate-y-1/2 left-0 w-20 h-7 bg-primary rounded-md flex shadow-dpad-extruded">
-                    {/* Left button (disabled) */}
-                    <div className="flex-1 flex items-center justify-center opacity-30 rounded-l-md">
-                      <div className="w-0 h-0 border-t-[5px] border-b-[5px] border-r-[7px] border-t-transparent border-b-transparent border-r-foreground/60" />
+                    {/* Left (disabled) */}
+                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[26px] h-7 flex items-center justify-center opacity-30">
+                      <div className="w-0 h-0 border-t-[5px] border-b-[5px] border-r-[7px] border-t-transparent border-b-transparent border-r-console-shadow/50" />
                     </div>
-                    {/* Right button (disabled) */}
-                    <div className="flex-1 flex items-center justify-center opacity-30 rounded-r-md">
-                      <div className="w-0 h-0 border-t-[5px] border-b-[5px] border-l-[7px] border-t-transparent border-b-transparent border-l-foreground/60" />
+                    {/* Right (disabled) */}
+                    <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[26px] h-7 flex items-center justify-center opacity-30">
+                      <div className="w-0 h-0 border-t-[5px] border-b-[5px] border-l-[7px] border-t-transparent border-b-transparent border-l-console-shadow/50" />
                     </div>
                   </div>
-                  {/* Center circle */}
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-primary border border-foreground/20 shadow-inner" />
                 </div>
               ) : (
-                <div className="dpad-container relative w-20 h-20 opacity-50">
-                  {/* Vertical bar */}
-                  <div className="absolute left-1/2 -translate-x-1/2 w-7 h-20 bg-primary rounded-md shadow-dpad-extruded" />
-                  {/* Horizontal bar */}
-                  <div className="absolute top-1/2 -translate-y-1/2 left-0 w-20 h-7 bg-primary rounded-md shadow-dpad-extruded" />
-                  {/* Center circle */}
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-primary border border-foreground/20 shadow-inner" />
+                <div className="dpad-cross-unified relative w-20 h-20 opacity-50 shadow-dpad-extruded rounded-md">
+                  <div className="absolute inset-0 bg-primary dpad-cross-shape" />
                 </div>
               )}
             </div>
 
             {/* RESET branding - centered */}
             <div className="absolute left-1/2 -translate-x-1/2 bottom-2">
-              <span className="text-console-shadow font-black text-[10px] tracking-[0.3em] opacity-40 uppercase">
+              <span className="text-console-shadow font-black text-xs tracking-[0.3em] opacity-40 uppercase">
                 Reset
               </span>
             </div>
@@ -116,14 +106,14 @@ const ConsoleFrame = ({
                 className="ab-button w-10 h-10 rounded-full bg-primary flex items-center justify-center shadow-ab-extruded active:shadow-ab-pressed active:translate-y-0.5 transition-all"
                 aria-label="A button"
               >
-                <span className="text-foreground font-bold text-xs">A</span>
+                <span className="text-console-shadow/50 font-bold text-xs">A</span>
               </button>
               <button
                 onClick={onButtonB}
                 className="ab-button w-10 h-10 rounded-full bg-primary flex items-center justify-center shadow-ab-extruded active:shadow-ab-pressed active:translate-y-0.5 transition-all"
                 aria-label="B button"
               >
-                <span className="text-foreground font-bold text-xs">B</span>
+                <span className="text-console-shadow/50 font-bold text-xs">B</span>
               </button>
             </div>
           </div>
