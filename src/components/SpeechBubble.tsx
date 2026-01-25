@@ -12,19 +12,16 @@ const SpeechBubble = ({ message, x, y, onComplete }: SpeechBubbleProps) => {
   const [opacity, setOpacity] = useState(0);
 
   useEffect(() => {
-    // Fade in
     const fadeIn = setTimeout(() => setOpacity(1), 50);
     
-    // Start fade out after 2.5 seconds
     const fadeOut = setTimeout(() => {
       setOpacity(0);
-    }, 2500);
+    }, 2000);
 
-    // Remove after fade out
     const remove = setTimeout(() => {
       setVisible(false);
       onComplete?.();
-    }, 3000);
+    }, 2500);
 
     return () => {
       clearTimeout(fadeIn);
@@ -37,13 +34,12 @@ const SpeechBubble = ({ message, x, y, onComplete }: SpeechBubbleProps) => {
 
   return (
     <div
-      className="speech-bubble absolute px-3 py-2 rounded-xl text-foreground text-sm font-bold 
-                 transition-all duration-500 ease-out pointer-events-none z-10 max-w-32 text-center"
+      className="bit-speech-bubble absolute pointer-events-none z-10 transition-all duration-300 ease-out"
       style={{
         left: x,
         top: y,
         opacity,
-        transform: `translateY(${opacity === 1 ? '-10px' : '0px'})`,
+        transform: `translateY(${opacity === 1 ? '-8px' : '0px'})`,
       }}
     >
       {message}

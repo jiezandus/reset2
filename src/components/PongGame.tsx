@@ -61,10 +61,14 @@ const PongGame = forwardRef<PongGameRef, PongGameProps>(({
   });
 
   const PADDLE_HEIGHT = 40;
-  const PADDLE_WIDTH = 6;
+  const PADDLE_WIDTH = 8;
   const BALL_SIZE = 6;
   const WINNING_SCORE = 10;
-  const PIXEL_SIZE = 2; // Base pixel size for retro look
+  const PIXEL_SIZE = 2;
+
+  // 1-bit colors
+  const BIT_WHITE = '#c8d4a2'; // LCD light
+  const BIT_BLACK = '#1a1a1a'; // LCD dark
 
   const addBubble = useCallback((x: number, y: number) => {
     const message = APOLOGY_MESSAGES[Math.floor(Math.random() * APOLOGY_MESSAGES.length)];
@@ -130,7 +134,6 @@ const PongGame = forwardRef<PongGameRef, PongGameProps>(({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Disable image smoothing for pixelated look
     ctx.imageSmoothingEnabled = false;
 
     const width = container.clientWidth;
@@ -138,7 +141,6 @@ const PongGame = forwardRef<PongGameRef, PongGameProps>(({
     canvas.width = width;
     canvas.height = height;
 
-    // Initialize game state
     const state = gameStateRef.current;
     state.ballX = width / 2;
     state.ballY = height / 2;
@@ -148,47 +150,34 @@ const PongGame = forwardRef<PongGameRef, PongGameProps>(({
     let animationId: number;
     let lastTime = 0;
 
-    // Helper function to draw pixelated rectangle
-    const drawPixelRect = (x: number, y: number, w: number, h: number, color: string) => {
-      ctx.fillStyle = color;
-      // Snap to pixel grid
-      const px = Math.floor(x / PIXEL_SIZE) * PIXEL_SIZE;
-      const py = Math.floor(y / PIXEL_SIZE) * PIXEL_SIZE;
-      const pw = Math.floor(w / PIXEL_SIZE) * PIXEL_SIZE;
-      const ph = Math.floor(h / PIXEL_SIZE) * PIXEL_SIZE;
-      ctx.fillRect(px, py, pw, ph);
-    };
+    const snapToGrid = (val: number) => Math.floor(val / PIXEL_SIZE) * PIXEL_SIZE;
 
-    // Helper function to draw pixelated circle (as square for retro look)
-    const drawPixelBall = (x: number, y: number, size: number, color: string) => {
-      ctx.fillStyle = color;
-      const px = Math.floor(x / PIXEL_SIZE) * PIXEL_SIZE;
-      const py = Math.floor(y / PIXEL_SIZE) * PIXEL_SIZE;
-      ctx.fillRect(px - size, py - size, size * 2, size * 2);
+    const drawPixelRect = (x: number, y: number, w: number, h: number) => {
+      ctx.fillStyle = BIT_BLACK;
+      ctx.fillRect(snapToGrid(x), snapToGrid(y), snapToGrid(w), snapToGrid(h));
     };
 
     const gameLoop = (timestamp: number) => {
       const deltaTime = timestamp - lastTime;
       lastTime = timestamp;
 
-      // Clear canvas with retro cream/green-ish background
-      ctx.fillStyle = '#c4cfa1'; // Classic LCD green tint
+      // Clear with 1-bit white
+      ctx.fillStyle = BIT_WHITE;
       ctx.fillRect(0, 0, width, height);
 
-      // Draw dotted center line (pixelated)
+      // Draw dotted center line
       const dotSize = PIXEL_SIZE * 2;
-      const gap = PIXEL_SIZE * 4;
-      ctx.fillStyle = '#9ca87a';
+      const gap = PIXEL_SIZE * 6;
+      ctx.fillStyle = BIT_BLACK;
       for (let y = 0; y < height; y += dotSize + gap) {
-        const px = Math.floor((width / 2 - dotSize / 2) / PIXEL_SIZE) * PIXEL_SIZE;
-        ctx.fillRect(px, y, dotSize, dotSize);
+        ctx.fillRect(snapToGrid(width / 2 - dotSize / 2), y, dotSize, dotSize);
       }
 
       // Update player paddle
       state.playerY += state.playerDir;
       state.playerY = Math.max(0, Math.min(height - PADDLE_HEIGHT, state.playerY));
 
-      // AI paddle logic (intentionally bad)
+      // AI paddle (intentionally bad)
       const aiCenter = state.aiY + PADDLE_HEIGHT / 2;
       const targetY = state.ballX > width * 0.5 
         ? state.ballY + (Math.random() - 0.5) * 60
@@ -214,7 +203,7 @@ const PongGame = forwardRef<PongGameRef, PongGameProps>(({
         state.ballY = Math.max(BALL_SIZE, Math.min(height - BALL_SIZE, state.ballY));
       }
 
-      // Ball collision with player paddle (left)
+      // Ball collision with player paddle
       if (
         state.ballX <= PADDLE_WIDTH + BALL_SIZE + 8 &&
         state.ballY >= state.playerY &&
@@ -226,7 +215,7 @@ const PongGame = forwardRef<PongGameRef, PongGameProps>(({
         state.ballVY = (hitPos - 0.5) * 6;
       }
 
-      // Ball collision with AI paddle (right)
+      // Ball collision with AI paddle
       if (
         state.ballX >= width - PADDLE_WIDTH - BALL_SIZE - 8 &&
         state.ballY >= state.aiY &&
@@ -239,7 +228,7 @@ const PongGame = forwardRef<PongGameRef, PongGameProps>(({
 
         if (timestamp - state.lastBubbleTime > 1500) {
           state.lastBubbleTime = timestamp;
-          addBubble(width - 60, state.aiY - 10);
+          addBubble(width - 70, state.aiY - 10);
         }
       }
 
@@ -264,33 +253,36 @@ const PongGame = forwardRef<PongGameRef, PongGameProps>(({
           return newScore;
         });
         resetBall(width, height);
-        addBubble(width - 60, state.aiY);
+        addBubble(width - 70, state.aiY);
       }
 
-      // Draw paddles (dark color for LCD look)
-      const paddleColor = '#1a1a1a';
-      drawPixelRect(8, state.playerY, PADDLE_WIDTH, PADDLE_HEIGHT, paddleColor);
-      drawPixelRect(width - PADDLE_WIDTH - 8, state.aiY, PADDLE_WIDTH, PADDLE_HEIGHT, paddleColor);
+      // Draw paddles (chunky pixels)
+      drawPixelRect(6, state.playerY, PADDLE_WIDTH, PADDLE_HEIGHT);
+      drawPixelRect(width - PADDLE_WIDTH - 6, state.aiY, PADDLE_WIDTH, PADDLE_HEIGHT);
 
-      // Draw ball
-      drawPixelBall(state.ballX, state.ballY, BALL_SIZE, paddleColor);
+      // Draw ball (square for 1-bit look)
+      ctx.fillStyle = BIT_BLACK;
+      ctx.fillRect(
+        snapToGrid(state.ballX - BALL_SIZE),
+        snapToGrid(state.ballY - BALL_SIZE),
+        BALL_SIZE * 2,
+        BALL_SIZE * 2
+      );
 
-      // Draw scores (pixelated)
-      ctx.font = 'bold 16px monospace';
+      // Draw scores
+      ctx.font = 'bold 20px monospace';
       ctx.textAlign = 'center';
-      ctx.fillStyle = '#1a1a1a';
-      
-      // Score display
-      ctx.fillText(recipientScore.toString(), width / 4, 24);
-      ctx.fillText(senderScore.toString(), (width / 4) * 3, 24);
+      ctx.fillStyle = BIT_BLACK;
+      ctx.fillText(recipientScore.toString(), width / 4, 28);
+      ctx.fillText(senderScore.toString(), (width / 4) * 3, 28);
 
-      // Player names (smaller)
-      ctx.font = '8px monospace';
-      ctx.fillStyle = '#4a4a4a';
-      const shortRecipient = recipientName.slice(0, 8).toUpperCase();
-      const shortSender = senderName.slice(0, 8).toUpperCase();
-      ctx.fillText(shortRecipient, width / 4, 38);
-      ctx.fillText(shortSender, (width / 4) * 3, 38);
+      // Player labels
+      ctx.font = 'bold 8px monospace';
+      ctx.fillStyle = BIT_BLACK;
+      const shortRecipient = recipientName.slice(0, 6).toUpperCase();
+      const shortSender = senderName.slice(0, 6).toUpperCase();
+      ctx.fillText(shortRecipient, width / 4, 42);
+      ctx.fillText(shortSender, (width / 4) * 3, 42);
 
       animationId = requestAnimationFrame(gameLoop);
     };
@@ -313,23 +305,23 @@ const PongGame = forwardRef<PongGameRef, PongGameProps>(({
 
   if (!gameStarted) {
     return (
-      <div className="relative w-full h-full flex flex-col items-center justify-center p-4 text-center" style={{ backgroundColor: '#c4cfa1' }}>
+      <div className="relative w-full h-full flex flex-col items-center justify-center p-4 text-center bit-bg">
         <div className="space-y-3 animate-slide-up">
-          <h2 className="text-lg font-bold text-foreground pixel-text" style={{ fontSize: '12px' }}>
-            HEY {recipientName.toUpperCase().slice(0, 10)}!
+          <h2 className="text-xs font-bold bit-text pixel-text uppercase">
+            HEY {recipientName.toUpperCase().slice(0, 8)}!
           </h2>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-[10px] bit-text opacity-70">
             {senderName} wants to say sorry for:
           </p>
-          <p className="text-sm font-semibold text-foreground italic px-2">
-            "{reason.slice(0, 50)}{reason.length > 50 ? '...' : ''}"
+          <p className="text-xs font-bold bit-text px-2 py-1 border-2 border-current inline-block">
+            "{reason.slice(0, 40)}{reason.length > 40 ? '...' : ''}"
           </p>
-          <div className="pt-2">
-            <span className="text-xs text-muted-foreground animate-blink">
+          <div className="pt-3">
+            <span className="text-[10px] bit-text animate-blink-cursor">
               ▶ PRESS A TO START
             </span>
           </div>
-          <p className="text-[10px] text-muted-foreground pt-2">
+          <p className="text-[9px] bit-text opacity-50 pt-2">
             Beat {senderName} to accept!
           </p>
         </div>
@@ -340,8 +332,7 @@ const PongGame = forwardRef<PongGameRef, PongGameProps>(({
   return (
     <div 
       ref={containerRef} 
-      className="relative w-full h-full"
-      style={{ backgroundColor: '#c4cfa1' }}
+      className="relative w-full h-full bit-bg"
     >
       <canvas ref={canvasRef} className="w-full h-full" style={{ imageRendering: 'pixelated' }} />
       {bubbles.map(bubble => (

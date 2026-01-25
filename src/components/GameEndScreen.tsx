@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Share2, Copy, Check, Heart } from 'lucide-react';
+import { Share2, Copy, Check } from 'lucide-react';
 
 interface GameEndScreenProps {
   senderName: string;
@@ -8,11 +8,11 @@ interface GameEndScreenProps {
 }
 
 const REPLY_MESSAGES = [
-  { emoji: '💛', text: "ACCEPTED!" },
-  { emoji: '🤗', text: "FORGIVEN!" },
-  { emoji: '😊', text: "WE'RE GOOD!" },
-  { emoji: '🎮', text: "GG!" },
-  { emoji: '💕', text: "MISSED U!" },
+  { text: "ACCEPTED!" },
+  { text: "FORGIVEN!" },
+  { text: "WE'RE GOOD!" },
+  { text: "GG!" },
+  { text: "MISSED U!" },
 ];
 
 const GameEndScreen = ({ senderName, recipientName, winner }: GameEndScreenProps) => {
@@ -23,7 +23,7 @@ const GameEndScreen = ({ senderName, recipientName, winner }: GameEndScreenProps
     if (selectedReply === null) return;
 
     const reply = REPLY_MESSAGES[selectedReply];
-    const shareText = `${reply.emoji} From ${recipientName}: "${reply.text}" — via RESET 💛`;
+    const shareText = `From ${recipientName}: "${reply.text}" — via RESET`;
 
     if (navigator.share) {
       try {
@@ -50,35 +50,51 @@ const GameEndScreen = ({ senderName, recipientName, winner }: GameEndScreenProps
   };
 
   return (
-    <div className="w-full h-full flex flex-col items-center justify-center p-3 text-center" style={{ backgroundColor: '#c4cfa1' }}>
+    <div className="w-full h-full flex flex-col items-center justify-center p-4 text-center bit-bg">
       {winner === 'recipient' ? (
-        <div className="flex flex-col items-center">
-          <div className="animate-pop-in">
-            <Heart className="w-8 h-8 text-foreground mx-auto mb-2 animate-bounce-soft" fill="currentColor" />
+        <div className="flex flex-col items-center animate-pop-in">
+          {/* Pixel heart */}
+          <div className="inline-block mb-3 animate-bounce-soft">
+            <div className="flex justify-center gap-[2px]">
+              <div className="w-3 h-3 bit-fg" />
+              <div className="w-3 h-3" />
+              <div className="w-3 h-3 bit-fg" />
+            </div>
+            <div className="flex justify-center gap-[2px]">
+              <div className="w-3 h-3 bit-fg" />
+              <div className="w-3 h-3 bit-fg" />
+              <div className="w-3 h-3 bit-fg" />
+            </div>
+            <div className="flex justify-center gap-[2px] mt-[2px]">
+              <div className="w-3 h-3" />
+              <div className="w-3 h-3 bit-fg" />
+              <div className="w-3 h-3" />
+            </div>
           </div>
-          <h2 className="text-sm font-bold text-foreground mb-1 pixel-text animate-slide-up">
-            YOU WON!
+          
+          <h2 className="text-sm font-bold bit-text pixel-text uppercase mb-1">
+            You Won!
           </h2>
-          <p className="text-xs text-muted-foreground mb-3 animate-slide-up" style={{ animationDelay: '0.1s' }}>
+          <p className="text-[10px] bit-text opacity-60 mb-4">
             {senderName}'s apology accepted
           </p>
 
-          <p className="text-[10px] text-muted-foreground mb-2">
+          <p className="text-[9px] bit-text uppercase tracking-wide mb-2">
             Send a reply:
           </p>
 
-          <div className="flex flex-wrap justify-center gap-1.5 mb-3 max-w-full">
+          <div className="flex flex-wrap justify-center gap-1.5 mb-4 max-w-full">
             {REPLY_MESSAGES.map((msg, idx) => (
               <button
                 key={idx}
                 onClick={() => setSelectedReply(idx)}
-                className={`px-2 py-1.5 rounded-lg text-[10px] font-medium transition-all duration-200
-                  ${selectedReply === idx 
-                    ? 'bg-primary text-foreground scale-105' 
-                    : 'bg-card text-muted-foreground'
-                  }`}
+                className={`px-2 py-1.5 text-[9px] font-bold transition-all ${
+                  selectedReply === idx 
+                    ? 'bit-button scale-105' 
+                    : 'bit-button-outline'
+                }`}
               >
-                {msg.emoji} {msg.text}
+                {msg.text}
               </button>
             ))}
           </div>
@@ -86,36 +102,52 @@ const GameEndScreen = ({ senderName, recipientName, winner }: GameEndScreenProps
           <button
             onClick={handleShare}
             disabled={selectedReply === null}
-            className={`action-button px-4 py-2 rounded-lg font-bold text-foreground flex items-center gap-1.5 text-sm
-              ${selectedReply === null ? 'opacity-50 cursor-not-allowed' : ''}`}
+            className="bit-button px-4 py-2 text-xs flex items-center gap-2"
           >
             {copied ? (
               <>
-                <Check className="w-4 h-4" />
+                <Check className="w-3 h-3" />
                 OK!
               </>
             ) : (
               <>
-                <Share2 className="w-4 h-4" />
+                <Share2 className="w-3 h-3" />
                 Share
               </>
             )}
           </button>
         </div>
       ) : (
-        <div className="flex flex-col items-center">
-          <p className="text-3xl mb-2">🫣</p>
-          <h2 className="text-sm font-bold text-foreground mb-1 pixel-text">
-            OOPS!
+        <div className="flex flex-col items-center animate-pop-in">
+          {/* Pixel sad face */}
+          <div className="inline-block mb-3">
+            <div className="flex justify-center gap-1">
+              <div className="w-2 h-2 bit-fg" />
+              <div className="w-2 h-2" />
+              <div className="w-2 h-2 bit-fg" />
+            </div>
+            <div className="flex justify-center gap-1 mt-1">
+              <div className="w-2 h-2" />
+              <div className="w-2 h-2" />
+              <div className="w-2 h-2" />
+            </div>
+            <div className="flex justify-center gap-1 mt-1">
+              <div className="w-2 h-2" />
+              <div className="w-2 h-2 bit-fg" />
+              <div className="w-2 h-2" />
+            </div>
+          </div>
+          <h2 className="text-sm font-bold bit-text pixel-text uppercase mb-1">
+            Oops!
           </h2>
-          <p className="text-xs text-muted-foreground mb-3">
+          <p className="text-[10px] bit-text opacity-60 mb-4">
             {senderName} won somehow...
           </p>
           <button
             onClick={() => window.location.reload()}
-            className="action-button px-4 py-2 rounded-lg font-bold text-foreground text-sm"
+            className="bit-button px-4 py-2 text-xs"
           >
-            Try Again 🔄
+            Try Again ►
           </button>
         </div>
       )}
