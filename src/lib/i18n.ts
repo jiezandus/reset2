@@ -87,7 +87,7 @@ export const translations = {
     cherishThem: "Cherish them always. Best wishes! ✨",
     
     // Share message for reply
-    replyShareMessage: "Hey {sender}! 💌\n\n{recipient} played your challenge and here's their response:\n\n\"{reply}\"\n\n— via RESET",
+    replyShareMessage: "{reply}",
   },
   zh: {
     // Index page - Header
@@ -173,7 +173,7 @@ export const translations = {
     cherishThem: "请永远珍惜。祝福你们！✨",
     
     // Share message for reply
-    replyShareMessage: "嘿 {sender}！💌\n\n{recipient} 玩了你的挑战，这是他们的回复：\n\n\"{reply}\"\n\n— 来自 RESET",
+    replyShareMessage: "{reply}",
   },
 } as const;
 
