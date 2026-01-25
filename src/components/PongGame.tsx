@@ -278,7 +278,7 @@ const PongGame = forwardRef<PongGameRef, PongGameProps>(({
       ctx.fillText(`${senderScore}/10`, (width / 4) * 3, 28);
 
       // Player labels
-      ctx.font = 'bold 8px monospace';
+      ctx.font = 'bold 16px monospace';
       ctx.fillStyle = BIT_BLACK;
       const shortRecipient = recipientName.slice(0, 6).toUpperCase();
       const shortSender = senderName.slice(0, 6).toUpperCase();
