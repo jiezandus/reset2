@@ -129,7 +129,7 @@ const Index = () => {
               disabled={!senderName || !recipientName || !reason}
               className="bit-button w-full py-3 text-xs mt-4"
             >
-              Generate Link ►
+              Generate Invite ►
             </button>
           </div>
         ) : (
