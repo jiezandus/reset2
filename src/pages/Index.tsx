@@ -8,6 +8,7 @@ const Index = () => {
   const [reason, setReason] = useState('');
   const [generatedLink, setGeneratedLink] = useState('');
   const [copied, setCopied] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const generateLink = () => {
     if (!senderName || !recipientName || !reason) return;
@@ -49,16 +50,68 @@ const Index = () => {
     try {
       await navigator.clipboard.writeText(shareMessage);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      setTimeout(() => {
+        setCopied(false);
+        setShowSuccess(true);
+      }, 500);
     } catch (err) {
       console.error('Failed to copy:', err);
     }
   };
 
+  const resetAll = () => {
+    setGeneratedLink('');
+    setSenderName('');
+    setRecipientName('');
+    setReason('');
+    setShowSuccess(false);
+  };
+
   return (
     <ConsoleFrame>
       <div className="p-4 h-full flex flex-col bit-bg">
-        {!generatedLink ? (
+        {showSuccess ? (
+          <div className="flex-1 flex flex-col items-center justify-center text-center animate-pop-in">
+            {/* Pixel sparkles */}
+            <div className="inline-block mb-4 animate-bounce-soft">
+              <div className="flex justify-center gap-2 mb-1">
+                <div className="w-1 h-1 bit-fg" />
+                <div className="w-2 h-2 bit-fg" />
+                <div className="w-1 h-1 bit-fg" />
+              </div>
+              <div className="flex justify-center gap-1">
+                <div className="w-2 h-2 bit-fg" />
+                <div className="w-3 h-3 bit-fg" />
+                <div className="w-2 h-2 bit-fg" />
+              </div>
+              <div className="flex justify-center gap-2 mt-1">
+                <div className="w-1 h-1 bit-fg" />
+                <div className="w-2 h-2 bit-fg" />
+                <div className="w-1 h-1 bit-fg" />
+              </div>
+            </div>
+            
+            <h2 className="text-sm font-bold bit-text pixel-text uppercase mb-2">
+              You Did It!
+            </h2>
+            <p className="text-[11px] bit-text mb-3">
+              First step: complete ✓
+            </p>
+            <p className="text-[10px] bit-text opacity-70 px-4 leading-relaxed mb-4">
+              Taking the first step is always the hardest. We're rooting for you and {recipientName}!
+            </p>
+            <p className="text-[10px] bit-text opacity-50 mb-6">
+              Good luck! 🍀
+            </p>
+            
+            <button
+              onClick={resetAll}
+              className="bit-button-outline px-4 py-2 text-[10px]"
+            >
+              Create Another
+            </button>
+          </div>
+        ) : !generatedLink ? (
           <div className="flex-1 flex flex-col animate-slide-up">
             {/* Header */}
             <div className="text-center mb-4">
@@ -193,12 +246,7 @@ const Index = () => {
               </button>
 
               <button
-                onClick={() => {
-                  setGeneratedLink('');
-                  setSenderName('');
-                  setRecipientName('');
-                  setReason('');
-                }}
+                onClick={resetAll}
                 className="bit-button flex-1 py-3 text-xs flex items-center justify-center gap-2"
               >
                 ← Back
