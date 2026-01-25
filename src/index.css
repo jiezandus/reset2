@@ -132,6 +132,7 @@
     image-rendering: pixelated;
     image-rendering: -moz-crisp-edges;
     image-rendering: crisp-edges;
+    font-size: 1.2em; /* 20% larger text */
   }
 
   .bg-console-shadow {
