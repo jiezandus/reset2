@@ -24,17 +24,34 @@ const Play = () => {
   if (!searchParams.get('sender') || !searchParams.get('recipient')) {
     return (
       <ConsoleFrame>
-        <div className="p-4 min-h-full flex flex-col items-center justify-center text-center" style={{ backgroundColor: '#c4cfa1' }}>
-          <p className="text-3xl mb-2">🤔</p>
-          <h2 className="text-sm font-bold text-foreground mb-1 pixel-text">INVALID LINK</h2>
-          <p className="text-xs text-muted-foreground mb-3">
+        <div className="p-4 h-full flex flex-col items-center justify-center text-center bit-bg">
+          {/* Pixel X mark */}
+          <div className="inline-block mb-3">
+            <div className="flex justify-center gap-[2px]">
+              <div className="w-2 h-2 bit-fg" />
+              <div className="w-2 h-2" />
+              <div className="w-2 h-2 bit-fg" />
+            </div>
+            <div className="flex justify-center gap-[2px]">
+              <div className="w-2 h-2" />
+              <div className="w-2 h-2 bit-fg" />
+              <div className="w-2 h-2" />
+            </div>
+            <div className="flex justify-center gap-[2px]">
+              <div className="w-2 h-2 bit-fg" />
+              <div className="w-2 h-2" />
+              <div className="w-2 h-2 bit-fg" />
+            </div>
+          </div>
+          <h2 className="text-sm font-bold bit-text pixel-text uppercase mb-1">Invalid Link</h2>
+          <p className="text-[10px] bit-text opacity-60 mb-4">
             This game link is broken.
           </p>
           <button
             onClick={() => navigate('/')}
-            className="action-button px-4 py-2 rounded-lg font-bold text-foreground text-sm"
+            className="bit-button px-4 py-2 text-xs"
           >
-            Create New
+            Create New ►
           </button>
         </div>
       </ConsoleFrame>

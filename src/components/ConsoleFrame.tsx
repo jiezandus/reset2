@@ -20,30 +20,37 @@ const ConsoleFrame = ({
   onButtonB 
 }: ConsoleFrameProps) => {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-background p-2">
-      {/* Console body - Playdate style */}
-      <div className="playdate-body relative w-full max-w-sm">
+    <div className="fixed inset-0 flex items-center justify-center bg-gradient-to-b from-gray-100 to-gray-200 overflow-hidden">
+      {/* Console body - Playdate style, fills screen */}
+      <div className="playdate-console relative w-full h-full max-w-[420px] max-h-[100dvh] flex flex-col">
         {/* Main body */}
-        <div className="relative bg-primary rounded-[2rem] p-3 shadow-playdate">
+        <div className="relative flex-1 flex flex-col bg-primary rounded-[2.5rem] shadow-console-3d mx-2 my-2">
           {/* Top edge highlight */}
-          <div className="absolute top-0 left-4 right-4 h-1 bg-gradient-to-b from-white/30 to-transparent rounded-full" />
+          <div className="absolute top-0 left-6 right-6 h-1.5 bg-gradient-to-b from-white/40 to-transparent rounded-full" />
           
-          {/* Screen bezel */}
-          <div className="relative bg-console-shadow rounded-xl p-1.5 shadow-screen-inset">
+          {/* Speaker grille */}
+          <div className="flex justify-center gap-1 pt-4 pb-2">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="w-1 h-1 rounded-full bg-console-shadow/30" />
+            ))}
+          </div>
+          
+          {/* Screen bezel - takes most space */}
+          <div className="relative flex-1 mx-4 mb-4 bg-console-shadow rounded-2xl p-2 shadow-screen-bezel">
             {/* Screen */}
-            <div className="console-screen rounded-lg overflow-hidden aspect-[4/3]">
+            <div className="console-screen-1bit rounded-xl overflow-hidden h-full">
               {children}
             </div>
           </div>
 
-          {/* Controls area */}
-          <div className="mt-4 flex items-center justify-between px-2">
+          {/* Controls area - fixed at bottom */}
+          <div className="flex items-center justify-between px-4 pb-6 pt-2">
             {/* D-pad */}
             <div className="relative">
               {showDpad ? (
-                <div className="dpad-cross">
+                <div className="dpad-container relative w-20 h-20">
                   {/* Vertical bar */}
-                  <div className="absolute left-1/2 -translate-x-1/2 w-8 h-24 bg-console-shadow rounded-lg flex flex-col">
+                  <div className="absolute left-1/2 -translate-x-1/2 w-7 h-20 bg-console-shadow rounded-md flex flex-col shadow-dpad-inset">
                     {/* Up button */}
                     <button
                       onTouchStart={(e) => { e.preventDefault(); onDpadUp?.(); }}
@@ -51,10 +58,10 @@ const ConsoleFrame = ({
                       onMouseDown={onDpadUp}
                       onMouseUp={onDpadRelease}
                       onMouseLeave={onDpadRelease}
-                      className="flex-1 flex items-center justify-center active:bg-black/20 rounded-t-lg"
+                      className="flex-1 flex items-center justify-center active:bg-white/10 rounded-t-md transition-colors"
                       aria-label="Move up"
                     >
-                      <div className="w-0 h-0 border-l-[6px] border-r-[6px] border-b-[8px] border-l-transparent border-r-transparent border-b-muted-foreground/50" />
+                      <div className="w-0 h-0 border-l-[5px] border-r-[5px] border-b-[7px] border-l-transparent border-r-transparent border-b-primary/40" />
                     </button>
                     {/* Down button */}
                     <button
@@ -63,77 +70,70 @@ const ConsoleFrame = ({
                       onMouseDown={onDpadDown}
                       onMouseUp={onDpadRelease}
                       onMouseLeave={onDpadRelease}
-                      className="flex-1 flex items-center justify-center active:bg-black/20 rounded-b-lg"
+                      className="flex-1 flex items-center justify-center active:bg-white/10 rounded-b-md transition-colors"
                       aria-label="Move down"
                     >
-                      <div className="w-0 h-0 border-l-[6px] border-r-[6px] border-t-[8px] border-l-transparent border-r-transparent border-t-muted-foreground/50" />
+                      <div className="w-0 h-0 border-l-[5px] border-r-[5px] border-t-[7px] border-l-transparent border-r-transparent border-t-primary/40" />
                     </button>
                   </div>
                   {/* Horizontal bar */}
-                  <div className="absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 w-24 h-8 bg-console-shadow rounded-lg flex">
+                  <div className="absolute top-1/2 -translate-y-1/2 left-0 w-20 h-7 bg-console-shadow rounded-md flex shadow-dpad-inset">
                     {/* Left button (disabled) */}
-                    <div className="flex-1 flex items-center justify-center opacity-40 rounded-l-lg">
-                      <div className="w-0 h-0 border-t-[6px] border-b-[6px] border-r-[8px] border-t-transparent border-b-transparent border-r-muted-foreground/50" />
+                    <div className="flex-1 flex items-center justify-center opacity-30 rounded-l-md">
+                      <div className="w-0 h-0 border-t-[5px] border-b-[5px] border-r-[7px] border-t-transparent border-b-transparent border-r-primary/40" />
                     </div>
                     {/* Right button (disabled) */}
-                    <div className="flex-1 flex items-center justify-center opacity-40 rounded-r-lg">
-                      <div className="w-0 h-0 border-t-[6px] border-b-[6px] border-l-[8px] border-t-transparent border-b-transparent border-l-muted-foreground/50" />
+                    <div className="flex-1 flex items-center justify-center opacity-30 rounded-r-md">
+                      <div className="w-0 h-0 border-t-[5px] border-b-[5px] border-l-[7px] border-t-transparent border-b-transparent border-l-primary/40" />
                     </div>
                   </div>
                   {/* Center circle */}
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-console-shadow border-2 border-black/20" />
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-console-shadow border border-black/20 shadow-inner" />
                 </div>
               ) : (
-                <div className="dpad-cross">
+                <div className="dpad-container relative w-20 h-20 opacity-50">
                   {/* Vertical bar */}
-                  <div className="absolute left-1/2 -translate-x-1/2 w-8 h-24 bg-console-shadow rounded-lg opacity-60" />
+                  <div className="absolute left-1/2 -translate-x-1/2 w-7 h-20 bg-console-shadow rounded-md shadow-dpad-inset" />
                   {/* Horizontal bar */}
-                  <div className="absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 w-24 h-8 bg-console-shadow rounded-lg opacity-60" />
+                  <div className="absolute top-1/2 -translate-y-1/2 left-0 w-20 h-7 bg-console-shadow rounded-md shadow-dpad-inset" />
                   {/* Center circle */}
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-console-shadow border-2 border-black/20 opacity-60" />
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-console-shadow border border-black/20 shadow-inner" />
                 </div>
               )}
-              {/* D-pad container size */}
-              <div className="w-24 h-24" />
             </div>
 
             {/* RESET branding - centered */}
             <div className="absolute left-1/2 -translate-x-1/2 bottom-2">
-              <span className="text-console-shadow font-black text-sm tracking-widest opacity-60">
-                RESET
+              <span className="text-console-shadow font-black text-[10px] tracking-[0.3em] opacity-40 uppercase">
+                Reset
               </span>
             </div>
 
             {/* A/B Buttons */}
-            <div className="flex gap-3">
+            <div className="flex gap-2">
               <button
                 onClick={onButtonB}
-                className="ab-button w-11 h-11 rounded-full bg-console-shadow flex items-center justify-center shadow-button active:shadow-button-pressed active:translate-y-0.5"
+                className="ab-button w-10 h-10 rounded-full bg-console-shadow flex items-center justify-center shadow-button-3d active:shadow-button-pressed active:translate-y-0.5 transition-all"
                 aria-label="B button"
               >
-                <span className="text-primary/70 font-bold text-sm">B</span>
+                <span className="text-primary/60 font-bold text-xs">B</span>
               </button>
               <button
                 onClick={onButtonA}
-                className="ab-button w-11 h-11 rounded-full bg-console-shadow flex items-center justify-center shadow-button active:shadow-button-pressed active:translate-y-0.5"
+                className="ab-button w-10 h-10 rounded-full bg-console-shadow flex items-center justify-center shadow-button-3d active:shadow-button-pressed active:translate-y-0.5 transition-all"
                 aria-label="A button"
               >
-                <span className="text-primary/70 font-bold text-sm">A</span>
+                <span className="text-primary/60 font-bold text-xs">A</span>
               </button>
             </div>
           </div>
         </div>
 
         {/* Side crank decoration (like Playdate) */}
-        <div className="absolute -right-3 top-8 w-6 h-14 bg-primary rounded-r-lg shadow-md flex items-center justify-center">
-          <div className="w-3 h-10 bg-console-shadow rounded-full" />
+        <div className="absolute -right-1 top-24 w-5 h-12 bg-primary rounded-r-lg shadow-crank flex items-center justify-center">
+          <div className="w-2.5 h-8 bg-console-shadow rounded-full shadow-inner" />
         </div>
       </div>
-
-      {/* Footer */}
-      <p className="mt-4 text-muted-foreground text-xs text-center">
-        Break the ice, one game at a time 💛
-      </p>
     </div>
   );
 };
