@@ -103,23 +103,27 @@
       0 1px 0 hsl(45 100% 55%);
   }
 
-  .shadow-button-3d {
+  /* Extruded D-pad shadow */
+  .shadow-dpad-extruded {
     box-shadow:
-      0 4px 0 hsl(0 0% 0% / 0.5),
+      0 3px 0 hsl(45 100% 38%),
+      0 5px 10px hsl(0 0% 0% / 0.25),
+      inset 0 1px 0 hsl(45 100% 70%);
+  }
+
+  /* Extruded A/B button shadows */
+  .shadow-ab-extruded {
+    box-shadow:
+      0 4px 0 hsl(45 100% 38%),
       0 6px 12px hsl(0 0% 0% / 0.3),
-      inset 0 1px 0 hsl(0 0% 100% / 0.1);
+      inset 0 1px 0 hsl(45 100% 70%);
   }
 
-  .shadow-dpad-inset {
+  .shadow-ab-pressed {
     box-shadow:
-      inset 0 2px 4px hsl(0 0% 0% / 0.4),
-      0 1px 0 hsl(45 100% 55% / 0.5);
-  }
-
-  .shadow-crank {
-    box-shadow:
-      2px 0 8px hsl(0 0% 0% / 0.2),
-      inset -1px 0 0 hsl(45 100% 55%);
+      0 1px 0 hsl(45 100% 38%),
+      0 2px 4px hsl(0 0% 0% / 0.2),
+      inset 0 1px 0 hsl(45 100% 70%);
   }
 
   /* 1-bit screen styling */
