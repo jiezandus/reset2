@@ -112,7 +112,7 @@ const Index = () => {
 
               <div>
                 <label className="text-[9px] font-bold bit-text uppercase tracking-wide block mb-1">
-                  What happened?
+                  I am sorry for....
                 </label>
                 <textarea
                   value={reason}
