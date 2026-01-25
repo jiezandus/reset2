@@ -86,8 +86,8 @@ const ConsoleFrame = ({
               )}
             </div>
 
-            {/* RESET branding - centered with buttons */}
-            <div className="flex items-center">
+            {/* RESET branding - centered to screen */}
+            <div className="absolute left-1/2 -translate-x-1/2 flex items-center">
               <span className="text-console-shadow font-black text-xs tracking-[0.3em] opacity-40 uppercase">
                 Reset
               </span>
