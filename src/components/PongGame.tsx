@@ -24,14 +24,15 @@ interface Bubble {
 }
 
 const APOLOGY_MESSAGES = [
-  "SORRY!",
+  "OOPS!",
+  "NICE ONE",
+  "UR GOOD",
   "MY BAD",
-  "FORGIVE?",
-  "OOPS",
-  "PLEASE?",
-  "I WAS WRONG",
-  "MISS U",
-  "IM SORRY",
+  "HELP ME",
+  "SORRY!",
+  "YIKES",
+  "TOO FAST",
+  "OUCH!",
 ];
 
 const PongGame = forwardRef<PongGameRef, PongGameProps>(({ 
