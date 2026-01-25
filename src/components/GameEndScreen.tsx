@@ -40,21 +40,7 @@ const GameEndScreen = forwardRef<GameEndScreenRef, GameEndScreenProps>(
 
   const handleShare = async () => {
     const shareText = getShareMessage();
-
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: 'RESET - Reply',
-          text: shareText,
-        });
-        // Navigate to success after sharing
-        setPhase('success');
-      } catch (err) {
-        copyToClipboard(shareText);
-      }
-    } else {
-      copyToClipboard(shareText);
-    }
+    copyToClipboard(shareText);
   };
 
   const copyToClipboard = async (text: string) => {
