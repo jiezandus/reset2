@@ -230,7 +230,7 @@ const Index = () => {
             <div className="flex-1 border-3 border-current p-3 text-[10px] bit-text break-all overflow-auto" style={{ borderWidth: '3px', borderColor: 'hsl(40 10% 10%)' }}>
               <p className="mb-2">Hey {recipientName}! 👀✨</p>
               <p className="mb-2">Someone has something to say to you...</p>
-              <p className="opacity-60 font-mono text-[8px]">{generatedLink}</p>
+              <p className="opacity-60 font-mono text-[8px]">{`${window.location.origin}/play?...`}</p>
             </div>
 
             {/* Action buttons */}
