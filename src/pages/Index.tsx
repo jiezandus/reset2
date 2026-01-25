@@ -97,8 +97,11 @@ const Index = () => {
             <p className="text-[11px] bit-text mb-3">
               First step: complete ✓
             </p>
-            <p className="text-[10px] bit-text opacity-70 px-4 leading-relaxed mb-4">
+            <p className="text-[10px] bit-text opacity-70 px-4 leading-relaxed mb-3">
               Taking the first step is always the hardest. We're rooting for you and {recipientName}!
+            </p>
+            <p className="text-[10px] bit-text opacity-60 mb-3">
+              Now let's wait for their response...
             </p>
             <p className="text-[10px] bit-text opacity-50 mb-6">
               Good luck! 🍀
