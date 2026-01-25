@@ -33,17 +33,20 @@ const Play = () => {
         </div>
       </ConsoleFrame>;
   }
+  const pongGameRef = useRef<import('@/components/PongGame').PongGameRef | null>(null);
+  
   return <ConsoleFrame showDpad={gameState === 'playing'} onDpadUp={() => {
-    // Trigger keyboard event for game
-    window.dispatchEvent(new KeyboardEvent('keydown', {
-      key: 'ArrowUp'
-    }));
+    pongGameRef.current?.moveUp();
   }} onDpadDown={() => {
-    window.dispatchEvent(new KeyboardEvent('keydown', {
-      key: 'ArrowDown'
-    }));
+    pongGameRef.current?.moveDown();
+  }} onDpadRelease={() => {
+    pongGameRef.current?.stopMove();
+  }} onButtonA={() => {
+    if (gameState === 'playing') {
+      pongGameRef.current?.startGame();
+    }
   }} onButtonB={gameState === 'ended' ? () => endScreenRef.current?.pressB() : undefined}>
-      {gameState === 'playing' ? <PongGame senderName={senderName} recipientName={recipientName} reason={reason} onGameEnd={handleGameEnd} /> : <GameEndScreen ref={endScreenRef} senderName={senderName} recipientName={recipientName} reason={reason} winner={winner} onBack={() => setGameState('playing')} />}
+      {gameState === 'playing' ? <PongGame ref={pongGameRef} senderName={senderName} recipientName={recipientName} reason={reason} onGameEnd={handleGameEnd} /> : <GameEndScreen ref={endScreenRef} senderName={senderName} recipientName={recipientName} reason={reason} winner={winner} onBack={() => setGameState('playing')} />}
     </ConsoleFrame>;
 };
 export default Play;

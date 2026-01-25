@@ -51,8 +51,8 @@ const PongGame = forwardRef<PongGameRef, PongGameProps>(({
   const gameStateRef = useRef({
     ballX: 0,
     ballY: 0,
-    ballVX: 2.16, // 20% faster
-    ballVY: 1.44, // 20% faster
+    ballVX: 2.6, // 40% faster than original
+    ballVY: 1.73, // 40% faster than original
     playerY: 0,
     aiY: 0,
     playerDir: 0,
@@ -270,11 +270,11 @@ const PongGame = forwardRef<PongGameRef, PongGameProps>(({
       );
 
       // Draw scores
-      ctx.font = 'bold 20px monospace';
+      ctx.font = 'bold 16px monospace';
       ctx.textAlign = 'center';
       ctx.fillStyle = BIT_BLACK;
-      ctx.fillText(recipientScore.toString(), width / 4, 28);
-      ctx.fillText(senderScore.toString(), (width / 4) * 3, 28);
+      ctx.fillText(`${recipientScore}/10`, width / 4, 28);
+      ctx.fillText(`${senderScore}/10`, (width / 4) * 3, 28);
 
       // Player labels
       ctx.font = 'bold 8px monospace';
@@ -290,8 +290,8 @@ const PongGame = forwardRef<PongGameRef, PongGameProps>(({
     const resetBall = (w: number, h: number) => {
       state.ballX = w / 2;
       state.ballY = h / 2;
-      state.ballVX = (Math.random() > 0.5 ? 2.16 : -2.16); // 20% faster
-      state.ballVY = (Math.random() - 0.5) * 2.88; // 20% faster
+      state.ballVX = (Math.random() > 0.5 ? 2.6 : -2.6); // 40% faster than original
+      state.ballVY = (Math.random() - 0.5) * 3.46; // 40% faster than original
     };
 
     if (gameStarted) {
