@@ -9,13 +9,14 @@ export interface LuckyWheelRef {
 
 interface LuckyWheelProps {
   language: Language;
+  customPrizes?: string[];
   onResult: (prize: string) => void;
 }
 
 const SEGMENTS = 6;
 const SPIN_DURATION = 3000;
 
-const LuckyWheel = forwardRef<LuckyWheelRef, LuckyWheelProps>(({ language, onResult }, ref) => {
+const LuckyWheel = forwardRef<LuckyWheelRef, LuckyWheelProps>(({ language, customPrizes, onResult }, ref) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [rotation, setRotation] = useState(0);
   const [spinning, setSpinning] = useState(false);
@@ -23,7 +24,7 @@ const LuckyWheel = forwardRef<LuckyWheelRef, LuckyWheelProps>(({ language, onRes
   const freeSpinRef = useRef(false);
   const freeSpinStartRef = useRef(0);
 
-  const prizes = getWheelPrizes(language);
+  const prizes = getWheelPrizes(language, customPrizes);
 
   const drawWheel = useCallback((canvas: HTMLCanvasElement, currentRotation: number) => {
     const ctx = canvas.getContext('2d');

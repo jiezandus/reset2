@@ -101,6 +101,12 @@ export const translations = {
     wheelPrize6: "A heartfelt letter",
     couponAppend: "P.S. Don't forget you owe me: {prize}",
 
+    // Prize customization page
+    customizePrizes: "CUSTOMIZE PRIZES",
+    customizePrizesSubtitle: "Set what's on the wheel!",
+    prizeLabel: "Prize {num}",
+    nextStep: "Next ►",
+
     // Share message for reply
     replyShareMessage: "{reply}\n\n{coupon}",
   },
@@ -202,6 +208,12 @@ export const translations = {
     wheelPrize6: "一封真心的信",
     couponAppend: "附：别忘了你欠我：{prize}",
 
+    // Prize customization page
+    customizePrizes: "自定义奖品",
+    customizePrizesSubtitle: "设置转盘上的内容！",
+    prizeLabel: "奖品 {num}",
+    nextStep: "下一步 ►",
+
     // Share message for reply
     replyShareMessage: "{reply}\n\n{coupon}",
   },
@@ -240,8 +252,9 @@ export const getApologyMessages = (lang: Language): string[] => {
   ];
 };
 
-// Get wheel prizes
-export const getWheelPrizes = (lang: Language): string[] => {
+// Get wheel prizes (defaults or custom)
+export const getWheelPrizes = (lang: Language, custom?: string[]): string[] => {
+  if (custom && custom.length === 6) return custom;
   const tr = translations[lang];
   return [
     tr.wheelPrize1,
@@ -251,6 +264,11 @@ export const getWheelPrizes = (lang: Language): string[] => {
     tr.wheelPrize5,
     tr.wheelPrize6,
   ];
+};
+
+// Get default wheel prizes for a language
+export const getDefaultPrizes = (lang: Language): string[] => {
+  return getWheelPrizes(lang);
 };
 
 // Get reply options for the game end screen

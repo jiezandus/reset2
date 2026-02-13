@@ -6,6 +6,7 @@ interface GameData {
   recipient: string;
   reason: string;
   lang?: Language;
+  prizes?: string[];
 }
 
 export const encodeGameData = (data: GameData): string => {
@@ -14,6 +15,7 @@ export const encodeGameData = (data: GameData): string => {
     r: data.recipient,
     m: data.reason,
     l: data.lang || 'en',
+    p: data.prizes,
   });
   return btoa(encodeURIComponent(json));
 };
@@ -27,6 +29,7 @@ export const decodeGameData = (encoded: string): GameData | null => {
       recipient: parsed.r || '',
       reason: parsed.m || '',
       lang: parsed.l || 'en',
+      prizes: parsed.p,
     };
   } catch {
     return null;

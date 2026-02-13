@@ -32,6 +32,7 @@ const Play = () => {
   const recipientName = gameData?.recipient || 'Friend';
   const reason = gameData?.reason || 'something';
   const language: Language = gameData?.lang || 'en';
+  const customPrizes = gameData?.prizes;
 
   const handleGameEnd = useCallback((gameWinner: 'recipient' | 'sender') => {
     setWinner(gameWinner);
@@ -93,6 +94,7 @@ const Play = () => {
           reason={reason} 
           language={language}
           winner={winner} 
+          customPrizes={customPrizes}
           onBack={() => setGameState('playing')} 
         />
       )}
