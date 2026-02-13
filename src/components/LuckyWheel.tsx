@@ -40,12 +40,15 @@ const LuckyWheel = forwardRef<LuckyWheelRef, LuckyWheelProps>(({ language, custo
     const radius = Math.min(cx, cy) - 8;
     const segAngle = (Math.PI * 2) / SEGMENTS;
 
-    ctx.fillStyle = '#f7f5f0';
-    ctx.fillRect(0, 0, w, h);
+    ctx.clearRect(0, 0, w, h);
 
     ctx.save();
     ctx.translate(cx, cy);
     ctx.rotate(currentRotation);
+
+    // Get the page background color from CSS
+    const pageBg = getComputedStyle(document.documentElement).getPropertyValue('--background').trim();
+    const lightColor = pageBg ? `hsl(${pageBg})` : '#d4d0c8';
 
     for (let i = 0; i < SEGMENTS; i++) {
       const startAngle = i * segAngle;
@@ -55,7 +58,7 @@ const LuckyWheel = forwardRef<LuckyWheelRef, LuckyWheelProps>(({ language, custo
       ctx.moveTo(0, 0);
       ctx.arc(0, 0, radius, startAngle, endAngle);
       ctx.closePath();
-      ctx.fillStyle = i % 2 === 0 ? '#2a2a1a' : '#f7f5f0';
+      ctx.fillStyle = i % 2 === 0 ? '#2a2a1a' : lightColor;
       ctx.fill();
       ctx.strokeStyle = '#2a2a1a';
       ctx.lineWidth = 2;
@@ -65,9 +68,9 @@ const LuckyWheel = forwardRef<LuckyWheelRef, LuckyWheelProps>(({ language, custo
       ctx.rotate(startAngle + segAngle / 2);
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.font = 'bold 14px monospace';
-      ctx.fillStyle = i % 2 === 0 ? '#f7f5f0' : '#2a2a1a';
-      ctx.fillText(String(i + 1), 0, radius * 0.6);
+      ctx.font = 'bold 18px monospace';
+      ctx.fillStyle = i % 2 === 0 ? lightColor : '#2a2a1a';
+      ctx.fillText(String(i + 1), 0, radius * 0.55);
       ctx.restore();
     }
 
