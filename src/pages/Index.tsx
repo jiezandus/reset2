@@ -285,11 +285,18 @@ const Index = () => {
             {/* Action buttons */}
             <div className="flex gap-2 mt-4">
               <button
+                onClick={resetAll}
+                className="bit-button-outline flex-1 py-3 text-xs flex items-center justify-center gap-2"
+              >
+                {t('back', language)}
+              </button>
+
+              <button
                 onClick={copyToClipboard}
-                className={`flex-1 py-3 text-xs flex items-center justify-center gap-2 transition-colors ${
+                className={`flex-1 py-3 text-xs flex items-center justify-center gap-2 ${
                   copied 
                     ? 'bit-button-outline' 
-                    : 'bit-button-outline'
+                    : 'bit-button'
                 }`}
               >
                 {copied ? (
@@ -303,13 +310,6 @@ const Index = () => {
                     {t('copy', language)}
                   </>
                 )}
-              </button>
-
-              <button
-                onClick={resetAll}
-                className="bit-button flex-1 py-3 text-xs flex items-center justify-center gap-2"
-              >
-                {t('back', language)}
               </button>
             </div>
           </div>
