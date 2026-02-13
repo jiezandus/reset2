@@ -11,6 +11,7 @@ interface GameEndScreenProps {
   reason: string;
   language: Language;
   winner: 'recipient' | 'sender';
+  customPrizes?: string[];
   onBack?: () => void;
 }
 
@@ -20,7 +21,7 @@ export interface GameEndScreenRef {
 }
 
 const GameEndScreen = forwardRef<GameEndScreenRef, GameEndScreenProps>(
-  ({ senderName, recipientName, reason, language, winner, onBack }, ref) => {
+  ({ senderName, recipientName, reason, language, winner, customPrizes, onBack }, ref) => {
   const [phase, setPhase] = useState<GamePhase>('apology');
   const [selectedReply, setSelectedReply] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
@@ -184,6 +185,7 @@ const GameEndScreen = forwardRef<GameEndScreenRef, GameEndScreenProps>(
           <LuckyWheel
             ref={wheelRef}
             language={language}
+            customPrizes={customPrizes}
             onResult={(prize) => {
               setWonPrize(prize);
               setTimeout(() => setPhase('coupon'), 600);

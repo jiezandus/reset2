@@ -3,7 +3,9 @@ import { Copy, Check } from 'lucide-react';
 import ConsoleFrame from '@/components/ConsoleFrame';
 import LanguageToggle from '@/components/LanguageToggle';
 import { encodeGameData } from '@/lib/urlEncoder';
-import { t, Language } from '@/lib/i18n';
+import { t, Language, getDefaultPrizes } from '@/lib/i18n';
+
+type SetupStep = 'form' | 'prizes' | 'link' | 'success';
 
 const Index = () => {
   const [senderName, setSenderName] = useState('');
@@ -11,22 +13,38 @@ const Index = () => {
   const [reason, setReason] = useState('');
   const [generatedLink, setGeneratedLink] = useState('');
   const [copied, setCopied] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
   const [language, setLanguage] = useState<Language>('en');
+  const [step, setStep] = useState<SetupStep>('form');
+  const [prizes, setPrizes] = useState<string[]>(() => getDefaultPrizes('en'));
+
+  const handleNextToprizes = () => {
+    if (!senderName || !recipientName || !reason) return;
+    // Reset prizes to defaults for current language
+    setPrizes(getDefaultPrizes(language));
+    setStep('prizes');
+  };
+
+  const updatePrize = (index: number, value: string) => {
+    setPrizes(prev => {
+      const next = [...prev];
+      next[index] = value;
+      return next;
+    });
+  };
 
   const generateLink = () => {
-    if (!senderName || !recipientName || !reason) return;
-    
     const encoded = encodeGameData({
       sender: senderName,
       recipient: recipientName,
       reason: reason,
       lang: language,
+      prizes: prizes,
     });
     
     const baseUrl = window.location.origin;
     const link = `${baseUrl}/play?d=${encoded}`;
     setGeneratedLink(link);
+    setStep('link');
   };
 
   const shareMessage = t('shareText', language, { name: recipientName, link: generatedLink });
@@ -37,7 +55,7 @@ const Index = () => {
       setCopied(true);
       setTimeout(() => {
         setCopied(false);
-        setShowSuccess(true);
+        setStep('success');
       }, 500);
     } catch (err) {
       console.error('Failed to copy:', err);
@@ -49,13 +67,13 @@ const Index = () => {
     setSenderName('');
     setRecipientName('');
     setReason('');
-    setShowSuccess(false);
+    setStep('form');
   };
 
   return (
     <ConsoleFrame>
       <div className="p-4 h-full flex flex-col bit-bg">
-        {showSuccess ? (
+        {step === 'success' ? (
           <div className="flex-1 flex flex-col items-center justify-center text-center animate-pop-in">
             {/* Pixel sparkles */}
             <div className="inline-block mb-4 animate-bounce-soft">
@@ -94,7 +112,7 @@ const Index = () => {
             
             <div className="flex gap-2">
               <button
-                onClick={() => setShowSuccess(false)}
+                onClick={() => setStep('link')}
                 className="bit-button-outline px-4 py-2 text-[10px]"
               >
                 {t('back', language)}
@@ -107,7 +125,47 @@ const Index = () => {
               </button>
             </div>
           </div>
-        ) : !generatedLink ? (
+        ) : step === 'prizes' ? (
+          /* Prize customization step */
+          <div className="flex-1 flex flex-col animate-slide-up">
+            <div className="text-center mb-3">
+              <h2 className="text-sm font-bold bit-text pixel-text uppercase">{t('customizePrizes', language)}</h2>
+              <p className="text-[10px] bit-text opacity-60 mt-1">{t('customizePrizesSubtitle', language)}</p>
+            </div>
+
+            <div className="space-y-2 flex-1 overflow-auto">
+              {prizes.map((prize, i) => (
+                <div key={i}>
+                  <label className="text-[9px] font-bold bit-text uppercase tracking-wide block mb-0.5">
+                    {t('prizeLabel', language, { num: String(i + 1) })}
+                  </label>
+                  <input
+                    type="text"
+                    value={prize}
+                    onChange={(e) => updatePrize(i, e.target.value)}
+                    className="bit-input w-full px-2 py-1.5 text-[11px]"
+                  />
+                </div>
+              ))}
+            </div>
+
+            <div className="flex gap-2 mt-3">
+              <button
+                onClick={() => setStep('form')}
+                className="bit-button-outline flex-1 py-2.5 text-xs"
+              >
+                {t('back', language)}
+              </button>
+              <button
+                onClick={generateLink}
+                disabled={prizes.some(p => !p.trim())}
+                className="bit-button flex-1 py-2.5 text-xs"
+              >
+                {t('generateInvite', language)}
+              </button>
+            </div>
+          </div>
+        ) : step === 'form' ? (
           <div className="flex-1 flex flex-col animate-slide-up">
             {/* Header */}
             <div className="text-center mb-4 relative">
@@ -181,14 +239,15 @@ const Index = () => {
             </div>
 
             <button
-              onClick={generateLink}
+              onClick={handleNextToprizes}
               disabled={!senderName || !recipientName || !reason}
               className="bit-button w-full py-3 text-xs mt-4"
             >
-              {t('generateInvite', language)}
+              {t('nextStep', language)}
             </button>
           </div>
         ) : (
+          /* Link ready screen */
           <div className="flex flex-col h-full animate-pop-in">
             {/* Success header */}
             <div className="text-center mb-4">
