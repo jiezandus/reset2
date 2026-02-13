@@ -46,9 +46,9 @@ const LuckyWheel = forwardRef<LuckyWheelRef, LuckyWheelProps>(({ language, custo
     ctx.translate(cx, cy);
     ctx.rotate(currentRotation);
 
-    // Get the page background color from CSS
-    const pageBg = getComputedStyle(document.documentElement).getPropertyValue('--background').trim();
-    const lightColor = pageBg ? `hsl(${pageBg})` : '#d4d0c8';
+    // Use the 1-bit screen color for light segments
+    const bitWhite = getComputedStyle(document.documentElement).getPropertyValue('--bit-white').trim();
+    const lightColor = bitWhite ? `hsl(${bitWhite})` : '#d4d0c8';
 
     for (let i = 0; i < SEGMENTS; i++) {
       const startAngle = i * segAngle;
