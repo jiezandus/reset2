@@ -70,7 +70,7 @@ const LuckyWheel = forwardRef<LuckyWheelRef, LuckyWheelProps>(({ language, custo
       ctx.textBaseline = 'middle';
       ctx.font = 'bold 18px monospace';
       ctx.fillStyle = i % 2 === 0 ? lightColor : '#2a2a1a';
-      ctx.fillText(String(i + 1), 0, radius * 0.55);
+      ctx.fillText(String(i + 1), radius * 0.6, 0);
       ctx.restore();
     }
 
