@@ -49,15 +49,15 @@ export const translations = {
     pressToStart: "▶ PRESS A TO START",
     
     // PongGame - Bubbles
-    bubbleOops: "OOPS!",
-    bubbleNiceOne: "NICE ONE",
-    bubbleUrGood: "UR GOOD",
-    bubbleMyBad: "MY BAD",
-    bubbleHelpMe: "HELP ME",
-    bubbleSorry: "SORRY!",
-    bubbleYikes: "YIKES",
-    bubbleTooFast: "TOO FAST",
-    bubbleOuch: "OUCH!",
+    bubbleOops: "I'M SORRY OK",
+    bubbleNiceOne: "I DESERVED THAT",
+    bubbleUrGood: "FORGIVE ME PLS",
+    bubbleMyBad: "MY BAD FR",
+    bubbleHelpMe: "I MESSED UP",
+    bubbleSorry: "SO SORRY!!",
+    bubbleYikes: "I FEEL AWFUL",
+    bubbleTooFast: "DON'T HATE ME",
+    bubbleOuch: "I OWE U BIG",
     
     // GameEndScreen - Sender won
     oops: "Oops!",
@@ -156,15 +156,15 @@ export const translations = {
     pressToStart: "▶ 按 A 开始",
     
     // PongGame - Bubbles
-    bubbleOops: "哎呀！",
-    bubbleNiceOne: "厉害！",
-    bubbleUrGood: "你真棒",
-    bubbleMyBad: "我的错",
-    bubbleHelpMe: "救命",
-    bubbleSorry: "抱歉！",
-    bubbleYikes: "糟糕",
-    bubbleTooFast: "太快了",
-    bubbleOuch: "好痛！",
+    bubbleOops: "对不起好吧",
+    bubbleNiceOne: "我活该",
+    bubbleUrGood: "求你原谅我",
+    bubbleMyBad: "真的是我的错",
+    bubbleHelpMe: "我搞砸了",
+    bubbleSorry: "太对不起了!!",
+    bubbleYikes: "我好内疚",
+    bubbleTooFast: "别讨厌我",
+    bubbleOuch: "我欠你的",
     
     // GameEndScreen - Sender won
     oops: "哎呀！",
