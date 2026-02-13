@@ -17,23 +17,22 @@ const fromUrlSafe = (s: string) => {
   return b;
 };
 
+// Delimiter-based format: lang\tsender\trecipient\treason[\tp1\tp2\t...]
+// Tab character is unlikely in user input and saves JSON overhead
+const SEP = '\t';
+
 export const encodeGameData = (data: GameData): string => {
   const lang = data.lang || 'en';
   const defaults = getWheelPrizes(lang);
-  // Only include prizes if they differ from defaults
   const prizesChanged = data.prizes && JSON.stringify(data.prizes) !== JSON.stringify(defaults);
 
-  const payload: Record<string, unknown> = {
-    s: data.sender,
-    r: data.recipient,
-    m: data.reason,
-    l: lang,
-  };
-  if (prizesChanged) payload.p = data.prizes;
+  const parts = [lang, data.sender, data.recipient, data.reason];
+  if (prizesChanged && data.prizes) {
+    parts.push(...data.prizes);
+  }
 
-  const json = JSON.stringify(payload);
-  // Use TextEncoder for proper UTF-8 → binary string for btoa
-  const bytes = new TextEncoder().encode(json);
+  const raw = parts.join(SEP);
+  const bytes = new TextEncoder().encode(raw);
   const binary = String.fromCharCode(...bytes);
   return toUrlSafe(btoa(binary));
 };
@@ -42,16 +41,33 @@ export const decodeGameData = (encoded: string): GameData | null => {
   try {
     const binary = atob(fromUrlSafe(encoded));
     const bytes = Uint8Array.from(binary, c => c.charCodeAt(0));
-    const json = new TextDecoder().decode(bytes);
-    const parsed = JSON.parse(json);
+    const raw = new TextDecoder().decode(bytes);
+    const parts = raw.split(SEP);
+    if (parts.length < 4) return null;
+
     return {
-      sender: parsed.s || '',
-      recipient: parsed.r || '',
-      reason: parsed.m || '',
-      lang: parsed.l || 'en',
-      prizes: parsed.p,
+      lang: (parts[0] as Language) || 'en',
+      sender: parts[1] || '',
+      recipient: parts[2] || '',
+      reason: parts[3] || '',
+      prizes: parts.length > 4 ? parts.slice(4) : undefined,
     };
   } catch {
-    return null;
+    // Fallback: try legacy JSON format
+    try {
+      const binary = atob(fromUrlSafe(encoded));
+      const bytes = Uint8Array.from(binary, c => c.charCodeAt(0));
+      const json = new TextDecoder().decode(bytes);
+      const parsed = JSON.parse(json);
+      return {
+        sender: parsed.s || '',
+        recipient: parsed.r || '',
+        reason: parsed.m || '',
+        lang: parsed.l || 'en',
+        prizes: parsed.p,
+      };
+    } catch {
+      return null;
+    }
   }
 };
