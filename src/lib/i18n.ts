@@ -86,8 +86,23 @@ export const translations = {
     relationshipsPrecious: "Relationships are precious gifts.",
     cherishThem: "Cherish them always. Best wishes! ✨",
     
+    // Lucky Wheel
+    spinTheWheel: "SPIN THE WHEEL",
+    wheelSubtitle: "Let's see how {name} makes it up!",
+    spinning: "Spinning...",
+    youGot: "You got:",
+    couponFrom: "{name} owes you:",
+    redeemCoupon: "Redeem this coupon!",
+    wheelPrize1: "Make you a nice dinner",
+    wheelPrize2: "Go to a game arcade",
+    wheelPrize3: "Buy the keyboard you wanted",
+    wheelPrize4: "Movie night, your pick",
+    wheelPrize5: "Boba tea for a week",
+    wheelPrize6: "A heartfelt letter",
+    couponAppend: "P.S. Don't forget you owe me: {prize}",
+
     // Share message for reply
-    replyShareMessage: "{reply}",
+    replyShareMessage: "{reply}\n\n{coupon}",
   },
   zh: {
     // Index page - Header
@@ -172,8 +187,23 @@ export const translations = {
     relationshipsPrecious: "感情是珍贵的礼物。",
     cherishThem: "请永远珍惜。祝福你们！✨",
     
+    // Lucky Wheel
+    spinTheWheel: "转转幸运轮",
+    wheelSubtitle: "看看{name}怎么补偿你！",
+    spinning: "转动中...",
+    youGot: "你获得了：",
+    couponFrom: "{name}欠你：",
+    redeemCoupon: "兑换这张优惠券！",
+    wheelPrize1: "给你做一顿大餐",
+    wheelPrize2: "一起去游戏厅",
+    wheelPrize3: "买你想要的键盘",
+    wheelPrize4: "电影之夜，你来选",
+    wheelPrize5: "请你喝一周奶茶",
+    wheelPrize6: "一封真心的信",
+    couponAppend: "附：别忘了你欠我：{prize}",
+
     // Share message for reply
-    replyShareMessage: "{reply}",
+    replyShareMessage: "{reply}\n\n{coupon}",
   },
 } as const;
 
@@ -207,6 +237,19 @@ export const getApologyMessages = (lang: Language): string[] => {
     tr.bubbleYikes,
     tr.bubbleTooFast,
     tr.bubbleOuch,
+  ];
+};
+
+// Get wheel prizes
+export const getWheelPrizes = (lang: Language): string[] => {
+  const tr = translations[lang];
+  return [
+    tr.wheelPrize1,
+    tr.wheelPrize2,
+    tr.wheelPrize3,
+    tr.wheelPrize4,
+    tr.wheelPrize5,
+    tr.wheelPrize6,
   ];
 };
 

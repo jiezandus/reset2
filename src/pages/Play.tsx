@@ -70,6 +70,8 @@ const Play = () => {
       onButtonA={() => {
         if (gameState === 'playing') {
           pongGameRef.current?.startGame();
+        } else {
+          endScreenRef.current?.pressA();
         }
       }} 
       onButtonB={gameState === 'ended' ? () => endScreenRef.current?.pressB() : undefined}

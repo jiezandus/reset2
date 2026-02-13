@@ -1,8 +1,9 @@
-import { forwardRef, useImperativeHandle, useState } from 'react';
+import { forwardRef, useImperativeHandle, useState, useRef } from 'react';
 import { Copy, Check } from 'lucide-react';
 import { t, Language, getReplyOptions } from '@/lib/i18n';
+import LuckyWheel, { type LuckyWheelRef } from '@/components/LuckyWheel';
 
-type GamePhase = 'apology' | 'reply' | 'success';
+type GamePhase = 'apology' | 'wheel' | 'coupon' | 'reply' | 'success';
 
 interface GameEndScreenProps {
   senderName: string;
@@ -15,6 +16,7 @@ interface GameEndScreenProps {
 
 export interface GameEndScreenRef {
   pressB: () => void;
+  pressA: () => void;
 }
 
 const GameEndScreen = forwardRef<GameEndScreenRef, GameEndScreenProps>(
@@ -22,22 +24,20 @@ const GameEndScreen = forwardRef<GameEndScreenRef, GameEndScreenProps>(
   const [phase, setPhase] = useState<GamePhase>('apology');
   const [selectedReply, setSelectedReply] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [wonPrize, setWonPrize] = useState<string | null>(null);
+  const wheelRef = useRef<LuckyWheelRef | null>(null);
 
   const replyOptions = getReplyOptions(language);
-
-  const handleContinueToReply = () => {
-    setPhase('reply');
-  };
 
   const selectedOption = replyOptions.find(opt => opt.id === selectedReply);
 
   const getShareMessage = () => {
     if (!selectedOption) return '';
+    const couponText = wonPrize ? t('couponAppend', language, { prize: wonPrize }) : '';
     return t('replyShareMessage', language, {
-      sender: senderName,
-      recipient: recipientName,
       reply: selectedOption.text,
-    });
+      coupon: couponText,
+    }).trim();
   };
 
   const handleShare = async () => {
@@ -58,28 +58,21 @@ const GameEndScreen = forwardRef<GameEndScreenRef, GameEndScreenProps>(
     }
   };
 
-  const handleSelectReply = (replyId: string) => {
-    setSelectedReply(replyId);
-  };
-
-  const handleBackFromReply = () => {
-    setPhase('apology');
-    setSelectedReply(null);
-  };
-
-  const handleBackFromSuccess = () => {
-    setPhase('reply');
-  };
-
   useImperativeHandle(
     ref,
     () => ({
       pressB: () => {
         if (winner === 'sender') return;
-
-        if (phase === 'apology') return handleContinueToReply();
-        if (phase === 'reply') return handleBackFromReply();
-        return handleBackFromSuccess();
+        if (phase === 'apology') return setPhase('wheel');
+        if (phase === 'wheel') return; // no action during wheel
+        if (phase === 'coupon') return setPhase('reply');
+        if (phase === 'reply') return setPhase('coupon');
+        return setPhase('reply'); // success -> back to reply
+      },
+      pressA: () => {
+        if (phase === 'wheel') {
+          wheelRef.current?.spin();
+        }
       },
     }),
     [phase, winner]
@@ -90,7 +83,6 @@ const GameEndScreen = forwardRef<GameEndScreenRef, GameEndScreenProps>(
     return (
       <div className="w-full h-full flex flex-col items-center justify-center p-4 text-center bit-bg">
         <div className="flex flex-col items-center animate-pop-in">
-          {/* Pixel sad face */}
           <div className="inline-block mb-3">
             <div className="flex justify-center gap-1">
               <div className="w-2 h-2 bit-fg" />
@@ -125,12 +117,11 @@ const GameEndScreen = forwardRef<GameEndScreenRef, GameEndScreenProps>(
     );
   }
 
-  // Phase 1: Apology reveal
+  // Phase: Apology reveal
   if (phase === 'apology') {
     return (
       <div className="w-full h-full flex flex-col items-center justify-center p-4 text-center bit-bg">
         <div className="flex flex-col items-center animate-pop-in">
-          {/* Pixel heart */}
           <div className="inline-block mb-3 animate-bounce-soft">
             <div className="flex justify-center gap-[2px]">
               <div className="w-3 h-3 bit-fg" />
@@ -166,7 +157,7 @@ const GameEndScreen = forwardRef<GameEndScreenRef, GameEndScreenProps>(
             {t('wouldYouLikeToReply', language)}
           </p>
           <button 
-            onClick={handleContinueToReply}
+            onClick={() => setPhase('wheel')}
             className="text-[10px] bit-text opacity-70 mt-2 animate-blink-cursor hover:opacity-100 transition-opacity"
           >
             {t('pressBToContinue', language)}
@@ -176,7 +167,65 @@ const GameEndScreen = forwardRef<GameEndScreenRef, GameEndScreenProps>(
     );
   }
 
-  // Phase 2: Reply selection
+  // Phase: Lucky Wheel
+  if (phase === 'wheel') {
+    return (
+      <div className="w-full h-full flex flex-col items-center justify-center p-3 text-center bit-bg">
+        <div className="flex flex-col items-center animate-pop-in">
+          <h2 className="text-sm font-bold bit-text pixel-text uppercase mb-1">
+            {t('spinTheWheel', language)}
+          </h2>
+          <p className="text-[9px] bit-text opacity-60 mb-2">
+            {t('wheelSubtitle', language, { name: senderName })}
+          </p>
+          <LuckyWheel
+            ref={wheelRef}
+            language={language}
+            onResult={(prize) => {
+              setWonPrize(prize);
+              setTimeout(() => setPhase('coupon'), 600);
+            }}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // Phase: Coupon reveal
+  if (phase === 'coupon') {
+    return (
+      <div className="w-full h-full flex flex-col items-center justify-center p-4 text-center bit-bg">
+        <div className="flex flex-col items-center animate-pop-in">
+          <h2 className="text-sm font-bold bit-text pixel-text uppercase mb-2">
+            {t('youGot', language)}
+          </h2>
+
+          {/* Coupon card */}
+          <div className="border-4 border-dashed border-current px-5 py-4 mb-3 max-w-[220px]">
+            <p className="text-[9px] bit-text opacity-60 mb-2 uppercase">
+              {t('couponFrom', language, { name: senderName })}
+            </p>
+            <p className="text-xs bit-text font-bold">
+              🎟️ {wonPrize}
+            </p>
+          </div>
+
+          <p className="text-[9px] bit-text opacity-50 mb-3">
+            {t('redeemCoupon', language)}
+          </p>
+
+          <button 
+            onClick={() => setPhase('reply')}
+            className="text-[10px] bit-text opacity-70 animate-blink-cursor hover:opacity-100 transition-opacity"
+          >
+            {t('pressBToContinue', language)}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Phase: Reply selection
   if (phase === 'reply') {
     return (
       <div className="w-full h-full flex flex-col items-center justify-center p-4 text-center bit-bg">
@@ -192,7 +241,7 @@ const GameEndScreen = forwardRef<GameEndScreenRef, GameEndScreenProps>(
             {replyOptions.map((option) => (
               <button
                 key={option.id}
-                onClick={() => handleSelectReply(option.id)}
+                onClick={() => setSelectedReply(option.id)}
                 className={`px-3 py-2.5 text-[10px] text-left transition-all ${
                   selectedReply === option.id 
                     ? 'bit-button' 
@@ -206,7 +255,7 @@ const GameEndScreen = forwardRef<GameEndScreenRef, GameEndScreenProps>(
 
           <div className="flex gap-2 w-full">
             <button
-              onClick={handleBackFromReply}
+              onClick={() => setPhase('coupon')}
               className="bit-button-outline flex-1 px-3 py-2 text-[10px]"
             >
               {t('back', language)}
@@ -234,11 +283,10 @@ const GameEndScreen = forwardRef<GameEndScreenRef, GameEndScreenProps>(
     );
   }
 
-  // Phase 3: Success / Congratulation
+  // Phase: Success
   return (
     <div className="w-full h-full flex flex-col items-center justify-center p-4 text-center bit-bg">
       <div className="flex flex-col items-center animate-pop-in">
-        {/* Pixel sparkles */}
         <div className="inline-block mb-4 animate-bounce-soft">
           <div className="flex justify-center gap-2 mb-1">
             <div className="w-1 h-1 bit-fg" />
@@ -279,7 +327,7 @@ const GameEndScreen = forwardRef<GameEndScreenRef, GameEndScreenProps>(
         </p>
 
         <button
-          onClick={handleBackFromSuccess}
+          onClick={() => setPhase('reply')}
           className="bit-button-outline px-4 py-2 text-[10px]"
         >
           {t('back', language)}
