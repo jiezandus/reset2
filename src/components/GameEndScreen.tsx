@@ -64,7 +64,10 @@ const GameEndScreen = forwardRef<GameEndScreenRef, GameEndScreenProps>(
       pressB: () => {
         if (winner === 'sender') return;
         if (phase === 'apology') return setPhase('wheel');
-        if (phase === 'wheel') return; // no action during wheel
+        if (phase === 'wheel') {
+          wheelRef.current?.stop();
+          return;
+        }
         if (phase === 'coupon') return setPhase('reply');
         if (phase === 'reply') return setPhase('coupon');
         return setPhase('reply'); // success -> back to reply

@@ -4,6 +4,7 @@ import { getWheelPrizes } from '@/lib/i18n';
 
 export interface LuckyWheelRef {
   spin: () => void;
+  stop: () => void;
 }
 
 interface LuckyWheelProps {
@@ -19,9 +20,8 @@ const LuckyWheel = forwardRef<LuckyWheelRef, LuckyWheelProps>(({ language, onRes
   const [rotation, setRotation] = useState(0);
   const [spinning, setSpinning] = useState(false);
   const animRef = useRef<number>(0);
-  const startTimeRef = useRef(0);
-  const targetRotationRef = useRef(0);
-  const baseRotationRef = useRef(0);
+  const freeSpinRef = useRef(false);
+  const freeSpinStartRef = useRef(0);
 
   const prizes = getWheelPrizes(language);
 
@@ -36,8 +36,8 @@ const LuckyWheel = forwardRef<LuckyWheelRef, LuckyWheelProps>(({ language, onRes
     const radius = Math.min(cx, cy) - 8;
     const segAngle = (Math.PI * 2) / SEGMENTS;
 
-    // LCD green bg
-    ctx.fillStyle = '#c8d4a2';
+    // Match page background
+    ctx.fillStyle = '#f7f5f0';
     ctx.fillRect(0, 0, w, h);
 
     ctx.save();
@@ -54,48 +54,20 @@ const LuckyWheel = forwardRef<LuckyWheelRef, LuckyWheelProps>(({ language, onRes
       ctx.moveTo(0, 0);
       ctx.arc(0, 0, radius, startAngle, endAngle);
       ctx.closePath();
-      ctx.fillStyle = i % 2 === 0 ? '#2a2a1a' : '#c8d4a2';
+      ctx.fillStyle = i % 2 === 0 ? '#2a2a1a' : '#f7f5f0';
       ctx.fill();
       ctx.strokeStyle = '#2a2a1a';
       ctx.lineWidth = 2;
       ctx.stroke();
 
-      // Draw text
+      // Draw number only
       ctx.save();
       ctx.rotate(startAngle + segAngle / 2);
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.font = 'bold 9px monospace';
-      ctx.fillStyle = i % 2 === 0 ? '#c8d4a2' : '#2a2a1a';
-
-      // Wrap text in segment
-      const text = prizes[i];
-      const textRadius = radius * 0.6;
-      
-      // Split into short lines
-      const maxChars = language === 'zh' ? 5 : 10;
-      const words = language === 'zh' ? text.split('') : text.split(' ');
-      const lines: string[] = [];
-      let currentLine = '';
-      
-      for (const word of words) {
-        const test = currentLine ? (language === 'zh' ? currentLine + word : currentLine + ' ' + word) : word;
-        if (test.length > maxChars && currentLine) {
-          lines.push(currentLine);
-          currentLine = word;
-        } else {
-          currentLine = test;
-        }
-      }
-      if (currentLine) lines.push(currentLine);
-
-      const lineHeight = 10;
-      const startY = textRadius - ((lines.length - 1) * lineHeight) / 2;
-      
-      lines.forEach((line, li) => {
-        ctx.fillText(line, 0, startY + li * lineHeight, radius * 0.5);
-      });
-
+      ctx.font = 'bold 14px monospace';
+      ctx.fillStyle = i % 2 === 0 ? '#f7f5f0' : '#2a2a1a';
+      ctx.fillText(String(i + 1), 0, radius * 0.6);
       ctx.restore();
     }
 
@@ -122,7 +94,7 @@ const LuckyWheel = forwardRef<LuckyWheelRef, LuckyWheelProps>(({ language, onRes
     ctx.lineTo(cx, 18);
     ctx.closePath();
     ctx.fill();
-  }, [prizes, language]);
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -130,44 +102,59 @@ const LuckyWheel = forwardRef<LuckyWheelRef, LuckyWheelProps>(({ language, onRes
     drawWheel(canvas, rotation);
   }, [rotation, drawWheel]);
 
-  // Easing: decelerate
-  const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
+  // Free-spin: constant speed while held
+  const SPIN_SPEED = 0.05; // radians per frame
 
-  const animate = useCallback(() => {
-    const elapsed = Date.now() - startTimeRef.current;
-    const progress = Math.min(elapsed / SPIN_DURATION, 1);
-    const eased = easeOutCubic(progress);
-    const current = baseRotationRef.current + targetRotationRef.current * eased;
-    
-    setRotation(current);
-
-    if (progress < 1) {
-      animRef.current = requestAnimationFrame(animate);
-    } else {
-      setSpinning(false);
-      // Determine which segment the pointer landed on
-      const finalAngle = current % (Math.PI * 2);
-      // Pointer is at top (negative y), so segment 0 starts at angle 0 (right)
-      // Adjust: the pointer is at -PI/2 from the right
-      const pointerAngle = (Math.PI * 2 - finalAngle + Math.PI * 1.5) % (Math.PI * 2);
-      const segIndex = Math.floor(pointerAngle / (Math.PI * 2 / SEGMENTS)) % SEGMENTS;
-      onResult(prizes[segIndex]);
-    }
-  }, [onResult, prizes]);
+  const animateFreeSpin = useCallback(() => {
+    setRotation(prev => prev + SPIN_SPEED);
+    animRef.current = requestAnimationFrame(animateFreeSpin);
+  }, []);
 
   const startSpin = useCallback(() => {
-    if (spinning) return;
+    if (freeSpinRef.current) return;
+    freeSpinRef.current = true;
     setSpinning(true);
-    baseRotationRef.current = rotation;
-    // 5-8 full rotations + random offset
-    targetRotationRef.current = Math.PI * 2 * (5 + Math.random() * 3) + Math.random() * Math.PI * 2;
-    startTimeRef.current = Date.now();
-    animRef.current = requestAnimationFrame(animate);
-  }, [spinning, rotation, animate]);
+    freeSpinStartRef.current = Date.now();
+    animRef.current = requestAnimationFrame(animateFreeSpin);
+  }, [animateFreeSpin]);
+
+  // Easing for deceleration after stop
+  const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
+
+  const stopSpin = useCallback(() => {
+    if (!freeSpinRef.current) return;
+    freeSpinRef.current = false;
+    cancelAnimationFrame(animRef.current);
+
+    // Now decelerate to a stop
+    const baseRot = rotation;
+    const extraRotation = Math.PI * 2 * (2 + Math.random() * 2) + Math.random() * Math.PI * 2;
+    const startTime = Date.now();
+
+    const decelerate = () => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / SPIN_DURATION, 1);
+      const eased = easeOutCubic(progress);
+      const current = baseRot + extraRotation * eased;
+      setRotation(current);
+
+      if (progress < 1) {
+        animRef.current = requestAnimationFrame(decelerate);
+      } else {
+        setSpinning(false);
+        const finalAngle = current % (Math.PI * 2);
+        const pointerAngle = (Math.PI * 2 - finalAngle + Math.PI * 1.5) % (Math.PI * 2);
+        const segIndex = Math.floor(pointerAngle / (Math.PI * 2 / SEGMENTS)) % SEGMENTS;
+        onResult(prizes[segIndex]);
+      }
+    };
+    animRef.current = requestAnimationFrame(decelerate);
+  }, [rotation, onResult, prizes]);
 
   useImperativeHandle(ref, () => ({
     spin: startSpin,
-  }), [startSpin]);
+    stop: stopSpin,
+  }), [startSpin, stopSpin]);
 
   useEffect(() => {
     return () => {
@@ -185,13 +172,13 @@ const LuckyWheel = forwardRef<LuckyWheelRef, LuckyWheelProps>(({ language, onRes
         style={{ imageRendering: 'pixelated' }}
       />
       {!spinning && (
-        <button onClick={startSpin} className="bit-button px-4 py-2 text-[10px]">
-          {language === 'zh' ? '转！' : 'SPIN!'}
-        </button>
+        <p className="text-[10px] bit-text opacity-60 animate-blink-cursor">
+          {language === 'zh' ? '按 A 开始转动' : 'Press A to spin'}
+        </p>
       )}
       {spinning && (
         <p className="text-[10px] bit-text opacity-60 animate-blink-cursor">
-          {language === 'zh' ? '转动中...' : 'Spinning...'}
+          {language === 'zh' ? '按 B 停止' : 'Press B to stop'}
         </p>
       )}
     </div>
