@@ -57,7 +57,7 @@ const PongGame = forwardRef<PongGameRef, PongGameProps>(({
   const PADDLE_HEIGHT = 100;
   const PADDLE_WIDTH = 8;
   const BALL_SIZE = 6;
-  const WINNING_SCORE = 10;
+  const WINNING_SCORE = 5;
   const PIXEL_SIZE = 2;
 
   const BIT_WHITE = '#c8d4a2';
@@ -254,8 +254,8 @@ const PongGame = forwardRef<PongGameRef, PongGameProps>(({
       ctx.font = 'bold 16px monospace';
       ctx.textAlign = 'center';
       ctx.fillStyle = BIT_BLACK;
-      ctx.fillText(`${recipientScore}/10`, width / 4, 28);
-      ctx.fillText(`${senderScore}/10`, (width / 4) * 3, 28);
+      ctx.fillText(`${recipientScore}/5`, width / 4, 28);
+      ctx.fillText(`${senderScore}/5`, (width / 4) * 3, 28);
 
       ctx.font = 'bold 16px monospace';
       ctx.fillStyle = BIT_BLACK;
