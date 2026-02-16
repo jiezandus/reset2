@@ -186,7 +186,7 @@ const Index = () => {
         ) : step === 'message' ? (
           /* Category + message step */
           <div className="flex-1 flex flex-col animate-slide-up">
-            <div className="text-center mb-3">
+            <div className="text-center mb-2 mt-auto">
               <div className="inline-block mb-2">
                 {/* Cute pixel heart */}
                 <div className="flex justify-center gap-[2px]">
@@ -260,7 +260,7 @@ const Index = () => {
         ) : step === 'form' ? (
           <div className="flex-1 flex flex-col animate-slide-up">
             {/* Header */}
-            <div className="text-center mb-4 relative">
+            <div className="text-center mb-2 mt-auto relative">
               {/* Language toggle - top right */}
               <div className="absolute top-0 right-0">
                 <LanguageToggle language={language} onToggle={setLanguage} />
