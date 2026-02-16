@@ -7,10 +7,10 @@ interface LanguageToggleProps {
 
 const LanguageToggle = ({ language, onToggle }: LanguageToggleProps) => {
   return (
-    <div className="flex items-center border-[1.5px] border-current">
+    <div className="flex items-center border-[1px] border-current">
       <button
         onClick={() => onToggle('en')}
-        className={`px-1 py-[1px] flex items-center justify-center text-[8px] font-bold transition-colors ${
+        className={`px-0.5 py-0 flex items-center justify-center text-[4px] font-bold leading-tight transition-colors ${
           language === 'en' 
             ? 'bit-fg text-[#c8d4a2]' 
             : 'bit-text opacity-60 hover:opacity-100'
@@ -20,7 +20,7 @@ const LanguageToggle = ({ language, onToggle }: LanguageToggleProps) => {
       </button>
       <button
         onClick={() => onToggle('zh')}
-        className={`px-1 py-[1px] flex items-center justify-center text-[8px] font-bold transition-colors ${
+        className={`px-0.5 py-0 flex items-center justify-center text-[4px] font-bold leading-tight transition-colors ${
           language === 'zh' 
             ? 'bit-fg text-[#c8d4a2]' 
             : 'bit-text opacity-60 hover:opacity-100'
