@@ -16,7 +16,7 @@ export const translations = {
     categoryThankyou: "Thanks",
 
     // Category-specific form labels & placeholders
-    labelApology: "I'd like to say...",
+    labelApology: "I'd like to apologize for...",
     labelMissyou: "I want you to know...",
     labelLove: "I love you because...",
     labelThankyou: "Thank you for...",
