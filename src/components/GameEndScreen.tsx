@@ -1,15 +1,16 @@
 import { forwardRef, useImperativeHandle, useState, useRef } from 'react';
 import { Copy, Check } from 'lucide-react';
-import { t, Language, getReplyOptions } from '@/lib/i18n';
+import { t, Language, MessageCategory, getReplyOptions, getRevealKey } from '@/lib/i18n';
 import LuckyWheel, { type LuckyWheelRef } from '@/components/LuckyWheel';
 
-type GamePhase = 'apology' | 'wheel' | 'coupon' | 'reply' | 'success';
+type GamePhase = 'reveal' | 'wheel' | 'coupon' | 'reply' | 'success';
 
 interface GameEndScreenProps {
   senderName: string;
   recipientName: string;
   reason: string;
   language: Language;
+  category?: MessageCategory;
   winner: 'recipient' | 'sender';
   customPrizes?: string[];
   onBack?: () => void;
@@ -21,14 +22,14 @@ export interface GameEndScreenRef {
 }
 
 const GameEndScreen = forwardRef<GameEndScreenRef, GameEndScreenProps>(
-  ({ senderName, recipientName, reason, language, winner, customPrizes, onBack }, ref) => {
-  const [phase, setPhase] = useState<GamePhase>('apology');
+  ({ senderName, recipientName, reason, language, category = 'apology', winner, customPrizes, onBack }, ref) => {
+  const [phase, setPhase] = useState<GamePhase>('reveal');
   const [selectedReply, setSelectedReply] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [wonPrize, setWonPrize] = useState<string | null>(null);
   const wheelRef = useRef<LuckyWheelRef | null>(null);
 
-  const replyOptions = getReplyOptions(language);
+  const replyOptions = getReplyOptions(language, category);
 
   const selectedOption = replyOptions.find(opt => opt.id === selectedReply);
 
@@ -64,7 +65,7 @@ const GameEndScreen = forwardRef<GameEndScreenRef, GameEndScreenProps>(
     () => ({
       pressB: () => {
         if (winner === 'sender') return;
-        if (phase === 'apology') return setPhase('wheel');
+        if (phase === 'reveal') return setPhase('wheel');
         if (phase === 'wheel') {
           wheelRef.current?.stop();
           return;
@@ -122,7 +123,7 @@ const GameEndScreen = forwardRef<GameEndScreenRef, GameEndScreenProps>(
   }
 
   // Phase: Apology reveal
-  if (phase === 'apology') {
+  if (phase === 'reveal') {
     return (
       <div className="w-full h-full flex flex-col items-center justify-center p-4 text-center bit-bg">
         <div className="flex flex-col items-center animate-pop-in">
@@ -153,7 +154,7 @@ const GameEndScreen = forwardRef<GameEndScreenRef, GameEndScreenProps>(
 
           <div className="border-2 border-current px-4 py-3 mb-4 max-w-[220px]">
             <p className="text-xs bit-text">
-              {t('iAmSorryFor', language, { reason: reason.slice(0, 70) + (reason.length > 70 ? '...' : '') })}
+              {t(getRevealKey(category), language, { reason: reason.slice(0, 70) + (reason.length > 70 ? '...' : '') })}
             </p>
           </div>
 
