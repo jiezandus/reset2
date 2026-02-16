@@ -197,7 +197,7 @@ const Index = () => {
                 <button
                   key={cat}
                   onClick={() => setCategory(cat)}
-                  className={`flex flex-col items-center gap-0 py-1 px-0.5 text-[7px] font-bold uppercase tracking-wide transition-all ${
+                  className={`flex flex-col items-center gap-0 py-1 px-0.5 text-[6px] font-bold uppercase tracking-wide transition-all ${
                     category === cat
                       ? 'bit-button'
                       : 'bit-button-outline opacity-70'
