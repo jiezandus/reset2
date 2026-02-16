@@ -187,6 +187,24 @@ const Index = () => {
           /* Category + message step */
           <div className="flex-1 flex flex-col animate-slide-up">
             <div className="text-center mb-3">
+              <div className="inline-block mb-2">
+                {/* Cute pixel heart */}
+                <div className="flex justify-center gap-[2px]">
+                  <div className="w-2 h-2 bit-fg" />
+                  <div className="w-2 h-2" />
+                  <div className="w-2 h-2 bit-fg" />
+                </div>
+                <div className="flex justify-center gap-[2px]">
+                  <div className="w-2 h-2 bit-fg" />
+                  <div className="w-2 h-2 bit-fg" />
+                  <div className="w-2 h-2 bit-fg" />
+                </div>
+                <div className="flex justify-center gap-[2px] mt-[2px]">
+                  <div className="w-2 h-2" />
+                  <div className="w-2 h-2 bit-fg" />
+                  <div className="w-2 h-2" />
+                </div>
+              </div>
               <h2 className="text-sm font-bold bit-text pixel-text uppercase">{t('breakTheIce', language)}</h2>
               <p className="text-[10px] bit-text opacity-60 mt-1">{t('createApologyGame', language)}</p>
             </div>
