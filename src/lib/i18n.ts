@@ -5,8 +5,8 @@ export type Language = 'en' | 'zh';
 export const translations = {
   en: {
     // Index page - Header
-    breakTheIce: "Break the Ice",
-    createApologyGame: "Create an apology game",
+    breakTheIce: "Thinking of You",
+    createApologyGame: "Send a heartfelt apology",
     
     // Index page - Form labels
     yourName: "Your Name",
@@ -112,8 +112,8 @@ export const translations = {
   },
   zh: {
     // Index page - Header
-    breakTheIce: "破冰行动",
-    createApologyGame: "创建一个道歉游戏",
+    breakTheIce: "在想你",
+    createApologyGame: "送上一份真心的道歉",
     
     // Index page - Form labels
     yourName: "你的名字",
