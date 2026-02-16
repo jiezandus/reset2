@@ -191,26 +191,26 @@ const Index = () => {
               <p className="text-[10px] bit-text opacity-60 mt-1">{t('createApologyGame', language)}</p>
             </div>
 
-            {/* Category Selector */}
-            <div className="grid grid-cols-4 gap-1 mb-4">
-              {CATEGORIES.map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => setCategory(cat)}
-                  className={`flex flex-col items-center gap-0 py-1 px-0.5 text-[5px] font-bold uppercase tracking-wide transition-all ${
-                    category === cat
-                      ? 'bit-button'
-                      : 'bit-button-outline opacity-70'
-                  }`}
-                >
-                  <span className="text-xs">{CATEGORY_EMOJI[cat]}</span>
-                  <span className="leading-tight">{t(`category${cat.charAt(0).toUpperCase() + cat.slice(1)}` as any, language)}</span>
-                </button>
-              ))}
-            </div>
-
-            {/* Message */}
+            {/* Category + Message grouped together, centered */}
             <div className="flex-1 flex flex-col justify-center">
+              {/* Category Selector */}
+              <div className="grid grid-cols-4 gap-1 mb-3">
+                {CATEGORIES.map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => setCategory(cat)}
+                    className={`flex flex-col items-center gap-0 py-1 px-0.5 text-[5px] font-bold uppercase tracking-wide transition-all ${
+                      category === cat
+                        ? 'bit-button'
+                        : 'bit-button-outline opacity-70'
+                    }`}
+                  >
+                    <span className="text-xs">{CATEGORY_EMOJI[cat]}</span>
+                    <span className="leading-tight">{t(`category${cat.charAt(0).toUpperCase() + cat.slice(1)}` as any, language)}</span>
+                  </button>
+                ))}
+              </div>
+
               <label className="text-[9px] font-bold bit-text uppercase tracking-wide block mb-1">
                 {t(getCategoryLabelKey(category), language)}
               </label>
