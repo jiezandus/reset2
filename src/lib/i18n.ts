@@ -11,7 +11,7 @@ export const translations = {
     
     // Category labels
     categoryApology: "Sorry",
-    categoryMissyou: "Miss You",
+    categoryMissyou: "Miss U",
     categoryLove: "Love",
     categoryThankyou: "Thanks",
 
