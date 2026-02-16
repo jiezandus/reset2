@@ -20,10 +20,10 @@ export const translations = {
     labelMissyou: "I want you to know...",
     labelLove: "I love you because...",
     labelThankyou: "Thank you for...",
-    placeholderApology: "being late / eating your food / ghosting you...",
-    placeholderMissyou: "I think about you every day...",
-    placeholderLove: "you make me laugh / you're my rock...",
-    placeholderThankyou: "always being there / your kindness...",
+    placeholderApology: "Type your personal message...",
+    placeholderMissyou: "Type your personal message...",
+    placeholderLove: "Type your personal message...",
+    placeholderThankyou: "Type your personal message...",
 
     // Category-specific reveal text
     revealApology: "I am sorry for {reason}",
