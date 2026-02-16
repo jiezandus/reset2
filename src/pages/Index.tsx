@@ -192,18 +192,18 @@ const Index = () => {
             </div>
 
             {/* Category Selector */}
-            <div className="grid grid-cols-4 gap-1.5 mb-4">
+            <div className="grid grid-cols-4 gap-1 mb-4">
               {CATEGORIES.map((cat) => (
                 <button
                   key={cat}
                   onClick={() => setCategory(cat)}
-                  className={`flex flex-col items-center gap-0.5 py-1.5 px-1 text-[8px] font-bold uppercase tracking-wide transition-all ${
+                  className={`flex flex-col items-center gap-0 py-1 px-0.5 text-[7px] font-bold uppercase tracking-wide transition-all ${
                     category === cat
                       ? 'bit-button'
                       : 'bit-button-outline opacity-70'
                   }`}
                 >
-                  <span className="text-sm">{CATEGORY_EMOJI[cat]}</span>
+                  <span className="text-xs">{CATEGORY_EMOJI[cat]}</span>
                   <span className="leading-tight">{t(`category${cat.charAt(0).toUpperCase() + cat.slice(1)}` as any, language)}</span>
                 </button>
               ))}
