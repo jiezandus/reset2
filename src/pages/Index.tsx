@@ -210,7 +210,7 @@ const Index = () => {
             </div>
 
             {/* Message */}
-            <div className="flex-1">
+            <div className="flex-1 flex flex-col justify-center">
               <label className="text-[9px] font-bold bit-text uppercase tracking-wide block mb-1">
                 {t(getCategoryLabelKey(category), language)}
               </label>
@@ -271,7 +271,7 @@ const Index = () => {
             </div>
 
             {/* Form - names only */}
-            <div className="space-y-3 flex-1">
+            <div className="space-y-3 flex-1 flex flex-col justify-center">
               <div>
                 <label className="text-[9px] font-bold bit-text uppercase tracking-wide block mb-1">
                   {t('yourName', language)}
