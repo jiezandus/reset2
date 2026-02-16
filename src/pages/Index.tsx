@@ -3,9 +3,18 @@ import { Copy, Check } from 'lucide-react';
 import ConsoleFrame from '@/components/ConsoleFrame';
 import LanguageToggle from '@/components/LanguageToggle';
 import { encodeGameData } from '@/lib/urlEncoder';
-import { t, Language, getDefaultPrizes } from '@/lib/i18n';
+import { t, Language, MessageCategory, getDefaultPrizes, getCategoryLabelKey, getCategoryPlaceholderKey } from '@/lib/i18n';
 
 type SetupStep = 'form' | 'prizes' | 'link' | 'success';
+
+const CATEGORIES: MessageCategory[] = ['apology', 'missyou', 'love', 'thankyou'];
+
+const CATEGORY_EMOJI: Record<MessageCategory, string> = {
+  apology: '💔',
+  missyou: '🌙',
+  love: '❤️',
+  thankyou: '🙏',
+};
 
 const Index = () => {
   const [senderName, setSenderName] = useState('');
@@ -16,10 +25,10 @@ const Index = () => {
   const [language, setLanguage] = useState<Language>('en');
   const [step, setStep] = useState<SetupStep>('form');
   const [prizes, setPrizes] = useState<string[]>(() => getDefaultPrizes('en'));
+  const [category, setCategory] = useState<MessageCategory>('apology');
 
   const handleNextToprizes = () => {
     if (!senderName || !recipientName || !reason) return;
-    // Reset prizes to defaults for current language
     setPrizes(getDefaultPrizes(language));
     setStep('prizes');
   };
@@ -38,6 +47,7 @@ const Index = () => {
       recipient: recipientName,
       reason: reason,
       lang: language,
+      category: category,
       prizes: prizes,
     });
     
@@ -67,8 +77,11 @@ const Index = () => {
     setSenderName('');
     setRecipientName('');
     setReason('');
+    setCategory('apology');
     setStep('form');
   };
+
+  
 
   return (
     <ConsoleFrame>
@@ -168,7 +181,7 @@ const Index = () => {
         ) : step === 'form' ? (
           <div className="flex-1 flex flex-col animate-slide-up">
             {/* Header */}
-            <div className="text-center mb-4 relative">
+            <div className="text-center mb-3 relative">
               {/* Language toggle - top right */}
               <div className="absolute top-0 right-0">
                 <LanguageToggle language={language} onToggle={setLanguage} />
@@ -194,6 +207,24 @@ const Index = () => {
               </div>
               <h1 className="text-sm font-bold bit-text pixel-text uppercase tracking-wider">{t('breakTheIce', language)}</h1>
               <p className="text-[10px] bit-text opacity-60 mt-1">{t('createApologyGame', language)}</p>
+            </div>
+
+            {/* Category Selector */}
+            <div className="grid grid-cols-4 gap-1.5 mb-3">
+              {CATEGORIES.map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setCategory(cat)}
+                  className={`flex flex-col items-center gap-0.5 py-1.5 px-1 text-[8px] font-bold uppercase tracking-wide transition-all ${
+                    category === cat
+                      ? 'bit-button'
+                      : 'bit-button-outline opacity-70'
+                  }`}
+                >
+                  <span className="text-sm">{CATEGORY_EMOJI[cat]}</span>
+                  <span className="leading-tight">{t(`category${cat.charAt(0).toUpperCase() + cat.slice(1)}` as any, language)}</span>
+                </button>
+              ))}
             </div>
 
             {/* Form */}
@@ -226,12 +257,12 @@ const Index = () => {
 
               <div>
                 <label className="text-[9px] font-bold bit-text uppercase tracking-wide block mb-1">
-                  {t('sorryFor', language)}
+                  {t(getCategoryLabelKey(category), language)}
                 </label>
                 <textarea
                   value={reason}
                   onChange={(e) => setReason(e.target.value)}
-                  placeholder={t('sorryPlaceholder', language)}
+                  placeholder={t(getCategoryPlaceholderKey(category), language)}
                   rows={2}
                   className="bit-input w-full px-3 py-2 text-xs resize-none"
                 />

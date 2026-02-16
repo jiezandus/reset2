@@ -1,11 +1,12 @@
 // Compact URL-safe encoding for game data
-import { Language, getWheelPrizes } from './i18n';
+import { Language, MessageCategory, getWheelPrizes } from './i18n';
 
 interface GameData {
   sender: string;
   recipient: string;
   reason: string;
   lang?: Language;
+  category?: MessageCategory;
   prizes?: string[];
 }
 
@@ -17,16 +18,16 @@ const fromUrlSafe = (s: string) => {
   return b;
 };
 
-// Delimiter-based format: lang\tsender\trecipient\treason[\tp1\tp2\t...]
-// Tab character is unlikely in user input and saves JSON overhead
+// Delimiter-based format: lang\tcategory\tsender\trecipient\treason[\tp1\tp2\t...]
 const SEP = '\t';
 
 export const encodeGameData = (data: GameData): string => {
   const lang = data.lang || 'en';
+  const category = data.category || 'apology';
   const defaults = getWheelPrizes(lang);
   const prizesChanged = data.prizes && JSON.stringify(data.prizes) !== JSON.stringify(defaults);
 
-  const parts = [lang, data.sender, data.recipient, data.reason];
+  const parts = [lang, category, data.sender, data.recipient, data.reason];
   if (prizesChanged && data.prizes) {
     parts.push(...data.prizes);
   }
@@ -43,15 +44,36 @@ export const decodeGameData = (encoded: string): GameData | null => {
     const bytes = Uint8Array.from(binary, c => c.charCodeAt(0));
     const raw = new TextDecoder().decode(bytes);
     const parts = raw.split(SEP);
-    if (parts.length < 4) return null;
+    
+    // New format: lang\tcategory\tsender\trecipient\treason[\tprizes...]
+    if (parts.length >= 5) {
+      const maybeCat = parts[1];
+      const validCategories: MessageCategory[] = ['apology', 'missyou', 'love', 'thankyou'];
+      if (validCategories.includes(maybeCat as MessageCategory)) {
+        return {
+          lang: (parts[0] as Language) || 'en',
+          category: maybeCat as MessageCategory,
+          sender: parts[2] || '',
+          recipient: parts[3] || '',
+          reason: parts[4] || '',
+          prizes: parts.length > 5 ? parts.slice(5) : undefined,
+        };
+      }
+    }
 
-    return {
-      lang: (parts[0] as Language) || 'en',
-      sender: parts[1] || '',
-      recipient: parts[2] || '',
-      reason: parts[3] || '',
-      prizes: parts.length > 4 ? parts.slice(4) : undefined,
-    };
+    // Legacy format (no category): lang\tsender\trecipient\treason[\tprizes...]
+    if (parts.length >= 4) {
+      return {
+        lang: (parts[0] as Language) || 'en',
+        category: 'apology',
+        sender: parts[1] || '',
+        recipient: parts[2] || '',
+        reason: parts[3] || '',
+        prizes: parts.length > 4 ? parts.slice(4) : undefined,
+      };
+    }
+
+    return null;
   } catch {
     // Fallback: try legacy JSON format
     try {
@@ -64,6 +86,7 @@ export const decodeGameData = (encoded: string): GameData | null => {
         recipient: parsed.r || '',
         reason: parsed.m || '',
         lang: parsed.l || 'en',
+        category: 'apology',
         prizes: parsed.p,
       };
     } catch {

@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState, useCallback, useImperativeHandle, forwardRef } from 'react';
 import SpeechBubble from './SpeechBubble';
-import { t, Language, getApologyMessages } from '@/lib/i18n';
+import { t, Language, MessageCategory, getBubbleMessages } from '@/lib/i18n';
 
 interface PongGameProps {
   senderName: string;
   recipientName: string;
   reason: string;
   language: Language;
+  category?: MessageCategory;
   onGameEnd: (winner: 'recipient' | 'sender') => void;
   onStartGame?: () => void;
 }
@@ -30,6 +31,7 @@ const PongGame = forwardRef<PongGameRef, PongGameProps>(({
   recipientName, 
   reason, 
   language,
+  category = 'apology',
   onGameEnd,
   onStartGame 
 }, ref) => {
@@ -40,7 +42,7 @@ const PongGame = forwardRef<PongGameRef, PongGameProps>(({
   const [bubbles, setBubbles] = useState<Bubble[]>([]);
   const [gameStarted, setGameStarted] = useState(false);
   
-  const apologyMessages = getApologyMessages(language);
+  const bubbleMessages = getBubbleMessages(language, category);
   
   const gameStateRef = useRef({
     ballX: 0,
@@ -64,10 +66,10 @@ const PongGame = forwardRef<PongGameRef, PongGameProps>(({
   const BIT_BLACK = '#1a1a1a';
 
   const addBubble = useCallback((x: number, y: number) => {
-    const message = apologyMessages[Math.floor(Math.random() * apologyMessages.length)];
+    const message = bubbleMessages[Math.floor(Math.random() * bubbleMessages.length)];
     const id = gameStateRef.current.bubbleId++;
     setBubbles(prev => [...prev, { id, message, x, y }]);
-  }, [apologyMessages]);
+  }, [bubbleMessages]);
 
   const removeBubble = useCallback((id: number) => {
     setBubbles(prev => prev.filter(b => b.id !== id));

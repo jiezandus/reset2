@@ -4,7 +4,7 @@ import ConsoleFrame from '@/components/ConsoleFrame';
 import PongGame from '@/components/PongGame';
 import GameEndScreen, { type GameEndScreenRef } from '@/components/GameEndScreen';
 import { decodeGameData } from '@/lib/urlEncoder';
-import { t, Language } from '@/lib/i18n';
+import { t, Language, MessageCategory } from '@/lib/i18n';
 
 const Play = () => {
   const [searchParams] = useSearchParams();
@@ -13,18 +13,17 @@ const Play = () => {
   const [winner, setWinner] = useState<'recipient' | 'sender'>('recipient');
   const endScreenRef = useRef<GameEndScreenRef | null>(null);
 
-  // Decode the obscured game data
   const gameData = useMemo(() => {
     const encoded = searchParams.get('d');
     if (encoded) {
       return decodeGameData(encoded);
     }
-    // Fallback to legacy plain params for old links
     return {
       sender: searchParams.get('sender') || '',
       recipient: searchParams.get('recipient') || '',
       reason: searchParams.get('reason') || '',
       lang: 'en' as Language,
+      category: 'apology' as MessageCategory,
     };
   }, [searchParams]);
 
@@ -32,6 +31,7 @@ const Play = () => {
   const recipientName = gameData?.recipient || 'Friend';
   const reason = gameData?.reason || 'something';
   const language: Language = gameData?.lang || 'en';
+  const category: MessageCategory = gameData?.category || 'apology';
   const customPrizes = gameData?.prizes;
 
   const handleGameEnd = useCallback((gameWinner: 'recipient' | 'sender') => {
@@ -39,7 +39,6 @@ const Play = () => {
     setGameState('ended');
   }, []);
 
-  // Validate that we have the required params
   if (!gameData?.sender || !gameData?.recipient) {
     return (
       <ConsoleFrame>
@@ -84,6 +83,7 @@ const Play = () => {
           recipientName={recipientName} 
           reason={reason} 
           language={language}
+          category={category}
           onGameEnd={handleGameEnd} 
         />
       ) : (
@@ -93,6 +93,7 @@ const Play = () => {
           recipientName={recipientName} 
           reason={reason} 
           language={language}
+          category={category}
           winner={winner} 
           customPrizes={customPrizes}
           onBack={() => setGameState('playing')} 
