@@ -10,10 +10,10 @@ export const translations = {
     createApologyGame: "Send a heartfelt message",
     
     // Category labels
-    categoryApology: "I'm Sorry",
-    categoryMissyou: "I Miss You",
-    categoryLove: "I Love You",
-    categoryThankyou: "Thank You",
+    categoryApology: "Sorry",
+    categoryMissyou: "Miss You",
+    categoryLove: "Love",
+    categoryThankyou: "Thanks",
 
     // Category-specific form labels & placeholders
     labelApology: "I am sorry for...",
@@ -197,10 +197,10 @@ export const translations = {
     createApologyGame: "送上一份真心的消息",
     
     // Category labels
-    categoryApology: "对不起",
-    categoryMissyou: "我想你",
-    categoryLove: "我爱你",
-    categoryThankyou: "谢谢你",
+    categoryApology: "抱歉",
+    categoryMissyou: "想你",
+    categoryLove: "爱你",
+    categoryThankyou: "感谢",
 
     // Category-specific form labels & placeholders
     labelApology: "我想为此道歉...",
